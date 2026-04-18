@@ -124,7 +124,6 @@
     </div>
 
     <script>
-        const CSRF = document.querySelector('meta[name="csrf-token"]')?.content || '';
         let allSuppliers = [];
         let currentId = null;
         let currentActive = null;

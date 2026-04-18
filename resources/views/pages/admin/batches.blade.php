@@ -40,7 +40,6 @@
                     <thead class="bg-gray-50 dark:bg-gray-800/60">
                         <tr>
                             <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500">#</th>
-                            <!-- ✅ FIX 2: label "No. RFQ" -->
                             <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500">No. RFQ</th>
                             <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500">Judul</th>
                             <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500">Deadline</th>
@@ -92,13 +91,11 @@
                         Deadline <span class="text-red-500">*</span>
                         <span class="text-gray-400 font-normal">(tidak bisa pilih tanggal lampau)</span>
                     </label>
-                    <!-- ✅ FIX 7: min diset via JS -->
                     <input id="batchDeadline" type="date"
                         class="w-full px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white">
                 </div>
                 <div id="statusRow" class="hidden">
                     <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">Status</label>
-                    <!-- ✅ FIX 4: hapus awarded -->
                     <select id="batchStatus"
                         class="w-full px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white">
                         <option value="draft">Draft (Belum dibuka ke supplier)</option>
@@ -139,24 +136,14 @@
     </div>
 
     <script>
-        const CSRF = () => document.querySelector('meta[name="csrf-token"]')?.content || '';
         let allBatches = [];
         let delId = null;
 
-        // ✅ FIX 4: hapus 'awarded' dari statusCls
         const statusCls = {
             draft: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
             open: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
             closed: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
         };
-
-        function fmtDate(d) {
-            return d ? new Date(d).toLocaleDateString('id-ID', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric'
-            }) : '—';
-        }
 
         function showModal(id) {
             const el = document.getElementById(id);
@@ -166,6 +153,22 @@
 
         function hideModal(id) {
             document.getElementById(id).style.display = 'none';
+        }
+
+        function CSRF() {
+            return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        }
+
+        function fmtDate(val) {
+            if (!val) return '—';
+            const d = new Date(val);
+            if (isNaN(d)) return val;
+            return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function fmtRp(val) {
+            if (val === null || val === undefined || val === '') return '—';
+            return 'Rp ' + Number(val).toLocaleString('id-ID');
         }
 
         function closeModalBatch() {
@@ -244,8 +247,8 @@
             document.getElementById('batchTitle').value = '';
             document.getElementById('batchDesc').value = '';
             document.getElementById('batchDeadline').value = '';
-            document.getElementById('batchDeadline').min = new Date().toISOString().split('T')[0]; // ✅ FIX 7
-            document.getElementById('statusRow').classList.add('hidden'); // status tersembunyi saat buat baru
+            document.getElementById('batchDeadline').min = new Date().toISOString().split('T')[0];
+            document.getElementById('statusRow').classList.add('hidden');
             document.getElementById('modalBatchTitle').textContent = 'Buat Batch RFQ';
             document.getElementById('alertBatch').classList.add('hidden');
             showModal('modalBatch');
@@ -258,9 +261,9 @@
             document.getElementById('batchTitle').value = b.title;
             document.getElementById('batchDesc').value = b.description || '';
             document.getElementById('batchDeadline').value = b.deadline ? b.deadline.toString().substring(0, 10) : '';
-            document.getElementById('batchDeadline').min = new Date().toISOString().split('T')[0]; // ✅ FIX 7
+            document.getElementById('batchDeadline').min = new Date().toISOString().split('T')[0];
             document.getElementById('batchStatus').value = b.status;
-            document.getElementById('statusRow').classList.remove('hidden'); // tampilkan status saat edit
+            document.getElementById('statusRow').classList.remove('hidden');
             document.getElementById('modalBatchTitle').textContent = 'Edit Batch';
             document.getElementById('alertBatch').classList.add('hidden');
             showModal('modalBatch');

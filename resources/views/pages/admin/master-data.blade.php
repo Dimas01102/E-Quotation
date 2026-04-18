@@ -230,7 +230,6 @@
 </div>
 
 <script>
-const CSRF = () => document.querySelector('meta[name="csrf-token"]')?.content || '';
 let allCats = [], allItems = [], allTpls = [];
 let delId = null, delType = null, activeTab = 'cat';
 

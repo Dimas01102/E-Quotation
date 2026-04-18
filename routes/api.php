@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Admin\DashboardController;
+use App\Http\Controllers\Api\Admin\AdminProfileController;
 use App\Http\Controllers\Api\Admin\SupplierController;
 use App\Http\Controllers\Api\Admin\MasterCategoryController;
 use App\Http\Controllers\Api\Admin\MasterItemController;
@@ -31,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware(\App\Http\Middleware\AdminMiddleware::class)->prefix('admin')->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index']);
+        Route::put('/profile', [AdminProfileController::class, 'update']);
 
         // Supplier
         Route::get('/suppliers',                    [SupplierController::class, 'index']);
