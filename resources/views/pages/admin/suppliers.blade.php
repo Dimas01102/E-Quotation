@@ -272,7 +272,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-CSRF-TOKEN': CSRF
+                        'X-CSRF-TOKEN': CSRF()
                     },
                     body: JSON.stringify({
                         is_active: newStatus
