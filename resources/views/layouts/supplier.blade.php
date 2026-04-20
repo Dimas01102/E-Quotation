@@ -7,29 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Supplier') - E-Quotation</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        /*
-         * Satu-satunya custom CSS: label transition di sidebar.
-         * Tidak bisa murni Tailwind karena butuh max-width transition.
-         */
-        .sb-label {
-            white-space: nowrap;
-            overflow: hidden;
-            transition: opacity 0.25s ease, max-width 0.25s ease;
-        }
-
-        .sb-expanded .sb-label {
-            opacity: 1;
-            max-width: 200px;
-        }
-
-        .sb-collapsed .sb-label {
-            opacity: 0;
-            max-width: 0;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gray-900 text-white antialiased">
@@ -41,25 +20,25 @@
             class="fixed inset-0 z-40 hidden bg-black bg-opacity-60 xl:hidden"></div>
 
         {{-- ══════════════════════════════
-         SIDEBAR DESKTOP (in flex row)
-    ══════════════════════════════ --}}
+             SIDEBAR DESKTOP 
+        ══════════════════════════════ --}}
         <aside id="main-sidebar"
-            class="sb-expanded
-                  flex-shrink-0 hidden xl:flex flex-col
-                  bg-gray-800 border-r border-gray-700
-                  px-3 overflow-hidden
-                  transition-all duration-300 ease-in-out
-                  w-64">
+            class="flex-shrink-0 hidden xl:flex flex-col
+                   bg-gray-800 border-r border-gray-700
+                   px-3 overflow-hidden"
+            style="width: 16rem; transition: width 0.3s ease;">
 
             {{-- Logo --}}
             <div class="flex h-16 flex-shrink-0 items-center gap-3 px-1">
-                <a href="/supplier/dashboard" class="flex items-center gap-3">
+                <a href="/supplier/dashboard" class="flex items-center gap-3 min-w-0">
                     <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
                         <i class="fas fa-shopping-cart text-white text-sm"></i>
                     </div>
-                    <div class="sb-label leading-tight">
-                        <p class="text-white font-bold text-sm">E-Quotation</p>
-                        <p class="text-gray-500 text-xs">Supplier Portal</p>
+                    <div id="desktopLogoLabel"
+                         class="leading-tight overflow-hidden"
+                         style="transition: opacity 0.2s ease, width 0.3s ease; opacity: 1; width: auto;">
+                        <p class="text-white font-bold text-sm whitespace-nowrap">E-Quotation</p>
+                        <p class="text-gray-500 text-xs whitespace-nowrap">Supplier Portal</p>
                     </div>
                 </a>
             </div>
@@ -67,31 +46,45 @@
             {{-- Nav --}}
             <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden py-3">
                 @php
-                    $seg = request()->segment(2) ?? '';
-                    $active =
-                        'flex items-center gap-3 rounded-xl bg-blue-900 bg-opacity-20 px-3 py-2.5 text-sm font-semibold text-blue-400';
-                    $normal =
-                        'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 transition-colors hover:bg-gray-700 hover:text-white';
-                    $ni = fn(bool $on) => $on ? $active : $normal;
+                    $seg    = request()->segment(2) ?? '';
+                    $active = 'flex items-center gap-3 rounded-xl bg-blue-900 bg-opacity-20 px-3 py-2.5 text-sm font-semibold text-blue-400';
+                    $normal = 'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 transition-colors hover:bg-gray-700 hover:text-white';
+                    $ni     = fn(bool $on) => $on ? $active : $normal;
                 @endphp
 
-                <p class="sb-label mt-1 mb-1 px-3 text-xs font-bold uppercase tracking-widest text-gray-500">Menu</p>
+                <p id="navSectionLabel"
+                   class="mt-1 mb-1 px-3 text-xs font-bold uppercase tracking-widest text-gray-500 whitespace-nowrap overflow-hidden"
+                   style="transition: opacity 0.2s ease, max-width 0.3s ease; max-width: 200px; opacity: 1;">
+                    Menu
+                </p>
 
-                <a href="/supplier/dashboard" class="{{ $ni($seg === 'dashboard') }}" title="Dashboard">
+                <a href="/supplier/dashboard" class="desk-nav-link {{ $ni($seg === 'dashboard') }}" title="Dashboard">
                     <i class="fas fa-home w-5 text-center flex-shrink-0"></i>
-                    <span class="sb-label">Dashboard</span>
+                    <span class="desk-nav-label whitespace-nowrap overflow-hidden"
+                          style="transition: opacity 0.2s ease, max-width 0.3s ease; max-width: 200px; opacity: 1;">
+                        Dashboard
+                    </span>
                 </a>
-                <a href="/supplier/rfq" class="{{ $ni($seg === 'rfq') }}" title="RFQ & Undangan">
+                <a href="/supplier/rfq" class="desk-nav-link {{ $ni($seg === 'rfq') }}" title="RFQ & Undangan">
                     <i class="fas fa-file-invoice w-5 text-center flex-shrink-0"></i>
-                    <span class="sb-label">RFQ &amp; Undangan</span>
+                    <span class="desk-nav-label whitespace-nowrap overflow-hidden"
+                          style="transition: opacity 0.2s ease, max-width 0.3s ease; max-width: 200px; opacity: 1;">
+                        RFQ &amp; Undangan
+                    </span>
                 </a>
-                <a href="/supplier/quotations" class="{{ $ni($seg === 'quotations') }}" title="Penawaran Saya">
+                <a href="/supplier/quotations" class="desk-nav-link {{ $ni($seg === 'quotations') }}" title="Penawaran Saya">
                     <i class="fas fa-paper-plane w-5 text-center flex-shrink-0"></i>
-                    <span class="sb-label">Penawaran Saya</span>
+                    <span class="desk-nav-label whitespace-nowrap overflow-hidden"
+                          style="transition: opacity 0.2s ease, max-width 0.3s ease; max-width: 200px; opacity: 1;">
+                        Penawaran Saya
+                    </span>
                 </a>
-                <a href="/supplier/profile" class="{{ $ni($seg === 'profile') }}" title="Profil Perusahaan">
+                <a href="/supplier/profile" class="desk-nav-link {{ $ni($seg === 'profile') }}" title="Profil Perusahaan">
                     <i class="fas fa-building w-5 text-center flex-shrink-0"></i>
-                    <span class="sb-label">Profil Perusahaan</span>
+                    <span class="desk-nav-label whitespace-nowrap overflow-hidden"
+                          style="transition: opacity 0.2s ease, max-width 0.3s ease; max-width: 200px; opacity: 1;">
+                        Profil Perusahaan
+                    </span>
                 </a>
 
                 {{-- User info + logout --}}
@@ -100,24 +93,29 @@
                         <div class="w-8 h-8 bg-green-900 rounded-lg flex items-center justify-center flex-shrink-0">
                             <i class="fas fa-user text-green-400 text-xs"></i>
                         </div>
-                        <div class="sb-label min-w-0">
-                            <p id="userNameSidebar" class="text-white text-xs font-medium truncate">-</p>
-                            <p class="text-gray-500 text-xs">Supplier</p>
+                        <div id="desktopUserLabel"
+                             class="min-w-0 overflow-hidden"
+                             style="transition: opacity 0.2s ease, width 0.3s ease; opacity: 1; width: auto;">
+                            <p id="userNameSidebar" class="text-white text-xs font-medium truncate whitespace-nowrap">-</p>
+                            <p class="text-gray-500 text-xs whitespace-nowrap">Supplier</p>
                         </div>
                     </div>
                     <button onclick="doLogout()" title="Logout"
-                        class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium
-                           text-red-400 transition-colors hover:bg-red-900 hover:bg-opacity-20 hover:text-red-300">
+                        class="desk-nav-link flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium
+                               text-red-400 transition-colors hover:bg-red-900 hover:bg-opacity-20 hover:text-red-300">
                         <i class="fas fa-sign-out-alt w-5 text-center flex-shrink-0"></i>
-                        <span class="sb-label">Logout</span>
+                        <span class="desk-nav-label whitespace-nowrap overflow-hidden"
+                              style="transition: opacity 0.2s ease, max-width 0.3s ease; max-width: 200px; opacity: 1;">
+                            Logout
+                        </span>
                     </button>
                 </div>
             </nav>
         </aside>
 
         {{-- ══════════════════════════════
-         PAGE AREA
-    ══════════════════════════════ --}}
+             PAGE AREA
+        ══════════════════════════════ --}}
         <div class="flex flex-1 flex-col min-w-0">
 
             {{-- TOPBAR --}}
@@ -129,15 +127,15 @@
                     {{-- Desktop toggle --}}
                     <button onclick="Sb.toggleDesktop()" title="Toggle Sidebar"
                         class="hidden xl:flex h-9 w-9 items-center justify-center rounded-lg
-                           border border-gray-700 text-gray-400
-                           hover:bg-gray-700 hover:text-white transition-colors">
+                               border border-gray-700 text-gray-400
+                               hover:bg-gray-700 hover:text-white transition-colors">
                         <i class="fas fa-bars text-sm"></i>
                     </button>
                     {{-- Mobile hamburger --}}
                     <button onclick="Sb.toggleMobile()" title="Menu"
                         class="flex xl:hidden h-9 w-9 items-center justify-center rounded-lg
-                           border border-gray-700 text-gray-400
-                           hover:bg-gray-700 hover:text-white transition-colors">
+                               border border-gray-700 text-gray-400
+                               hover:bg-gray-700 hover:text-white transition-colors">
                         <i class="fas fa-bars text-sm"></i>
                     </button>
 
@@ -155,11 +153,11 @@
     </div>
 
     {{-- ══════════════════════════════
-     MOBILE SIDEBAR (fixed overlay)
-══════════════════════════════ --}}
+         MOBILE SIDEBAR 
+    ══════════════════════════════ --}}
     <aside id="mob-sidebar"
         class="fixed inset-y-0 left-0 z-50 hidden w-64 flex-col
-              bg-gray-800 border-r border-gray-700 px-3 overflow-hidden xl:hidden">
+               bg-gray-800 border-r border-gray-700 px-3 overflow-hidden xl:hidden">
 
         <div class="flex h-16 flex-shrink-0 items-center gap-3 px-1">
             <a href="/supplier/dashboard" class="flex items-center gap-3">
@@ -203,7 +201,7 @@
                 </div>
                 <button onclick="doLogout()"
                     class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium
-                       text-red-400 transition-colors hover:bg-red-900 hover:bg-opacity-20 hover:text-red-300">
+                           text-red-400 transition-colors hover:bg-red-900 hover:bg-opacity-20 hover:text-red-300">
                     <i class="fas fa-sign-out-alt w-5 text-center flex-shrink-0"></i>
                     <span>Logout</span>
                 </button>
@@ -212,42 +210,75 @@
     </aside>
 
     <script>
-        /* ─── SIDEBAR ─────────────────────────────────────── */
         const Sb = {
+            STORAGE_KEY:  'sb_supplier_collapsed',
+            EXPANDED_W:   '16rem',   // w-64
+            COLLAPSED_W:  '4rem',    // w-16
+
             get isCollapsed() {
-                return localStorage.getItem('sb_supplier_collapsed') === '1';
+                return localStorage.getItem(this.STORAGE_KEY) === '1';
+            },
+
+            /* Terapkan state ke elemen desktop sidebar */
+            applyDesktop(collapsed) {
+                const sb       = document.getElementById('main-sidebar');
+                const labels   = document.querySelectorAll('.desk-nav-label');
+                const logoLbl  = document.getElementById('desktopLogoLabel');
+                const userLbl  = document.getElementById('desktopUserLabel');
+                const secLbl   = document.getElementById('navSectionLabel');
+
+                if (!sb) return;
+
+                if (collapsed) {
+                    sb.style.width = this.COLLAPSED_W;
+
+                    labels.forEach(el => {
+                        el.style.opacity  = '0';
+                        el.style.maxWidth = '0';
+                    });
+                    if (logoLbl) { logoLbl.style.opacity = '0'; logoLbl.style.width = '0'; }
+                    if (userLbl) { userLbl.style.opacity = '0'; userLbl.style.width = '0'; }
+                    if (secLbl)  { secLbl.style.opacity  = '0'; secLbl.style.maxWidth = '0'; }
+
+                    // Pusatkan icon
+                    document.querySelectorAll('.desk-nav-link').forEach(a => {
+                        a.style.justifyContent = 'center';
+                        a.style.paddingLeft    = '0';
+                        a.style.paddingRight   = '0';
+                    });
+
+                } else {
+                    sb.style.width = this.EXPANDED_W;
+
+                    labels.forEach(el => {
+                        el.style.opacity  = '1';
+                        el.style.maxWidth = '200px';
+                    });
+                    if (logoLbl) { logoLbl.style.opacity = '1'; logoLbl.style.width = 'auto'; }
+                    if (userLbl) { userLbl.style.opacity = '1'; userLbl.style.width = 'auto'; }
+                    if (secLbl)  { secLbl.style.opacity  = '1'; secLbl.style.maxWidth = '200px'; }
+
+                    document.querySelectorAll('.desk-nav-link').forEach(a => {
+                        a.style.justifyContent = '';
+                        a.style.paddingLeft    = '';
+                        a.style.paddingRight   = '';
+                    });
+                }
             },
 
             init() {
-                const sb = document.getElementById('main-sidebar');
-                if (!sb) return;
-                if (this.isCollapsed) {
-                    sb.classList.remove('w-64', 'sb-expanded');
-                    sb.classList.add('w-16', 'sb-collapsed');
-                } else {
-                    sb.classList.remove('w-16', 'sb-collapsed');
-                    sb.classList.add('w-64', 'sb-expanded');
-                }
+                this.applyDesktop(this.isCollapsed);
             },
 
             toggleDesktop() {
-                const sb = document.getElementById('main-sidebar');
-                if (!sb) return;
-                const collapsed = sb.classList.contains('sb-collapsed');
-                if (collapsed) {
-                    sb.classList.remove('w-16', 'sb-collapsed');
-                    sb.classList.add('w-64', 'sb-expanded');
-                    localStorage.setItem('sb_supplier_collapsed', '0');
-                } else {
-                    sb.classList.remove('w-64', 'sb-expanded');
-                    sb.classList.add('w-16', 'sb-collapsed');
-                    localStorage.setItem('sb_supplier_collapsed', '1');
-                }
+                const next = !this.isCollapsed;
+                localStorage.setItem(this.STORAGE_KEY, next ? '1' : '0');
+                this.applyDesktop(next);
             },
 
             toggleMobile() {
                 const mob = document.getElementById('mob-sidebar');
-                const bd = document.getElementById('mob-backdrop');
+                const bd  = document.getElementById('mob-backdrop');
                 const open = !mob.classList.contains('hidden');
                 if (open) {
                     mob.classList.add('hidden');
@@ -264,19 +295,14 @@
 
             closeMobile() {
                 const mob = document.getElementById('mob-sidebar');
-                const bd = document.getElementById('mob-backdrop');
-                if (mob) {
-                    mob.classList.add('hidden');
-                    mob.classList.remove('flex');
-                }
-                if (bd) {
-                    bd.classList.add('hidden');
-                }
+                const bd  = document.getElementById('mob-backdrop');
+                if (mob) { mob.classList.add('hidden'); mob.classList.remove('flex'); }
+                if (bd)  { bd.classList.add('hidden'); }
                 document.body.style.overflow = '';
             }
         };
 
-        /* ─── LOGOUT ──────────────────────────────────────── */
+        /* ── LOGOUT ──────────────────────────────────────── */
         async function doLogout() {
             try {
                 await fetch('/api/logout', {
@@ -290,18 +316,13 @@
             window.location.href = '/login';
         }
 
-        /* ─── LOAD USER ───────────────────────────────────── */
+        /* ── LOAD USER ───────────────────────────────────── */
         async function loadUser() {
             try {
                 const res = await fetch('/api/auth/me', {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
-                if (!res.ok) {
-                    window.location.href = '/login';
-                    return;
-                }
+                if (!res.ok) { window.location.href = '/login'; return; }
                 const data = await res.json();
                 const name = data.user?.name || data.name || 'Supplier';
                 ['userNameSidebar', 'topUserName', 'mobUserName'].forEach(id => {
