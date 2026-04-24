@@ -13,7 +13,7 @@ use Dompdf\Options;
 
 class QuotationController extends Controller
 {
-    // ── List ──────────────────────────────────────────────────────────
+    // List 
     public function index()
     {
         $quotations = Quotation::with([
@@ -25,7 +25,7 @@ class QuotationController extends Controller
         return response()->json(['success' => true, 'quotations' => $quotations]);
     }
 
-    // ── Detail — 17 kolom + download URL ─────────────────────────────
+    // Detail 17 kolom + download URL
     public function show($id)
     {
         $quotation = Quotation::with([
@@ -35,16 +35,16 @@ class QuotationController extends Controller
             'quotationItems',
         ])->findOrFail($id);
 
-        $data = $quotation->toArray();
+        $data                      = $quotation->toArray();
         $data['file_download_url'] = $quotation->file_path
             ? Storage::url($quotation->file_path) : null;
-        $data['po_download_url'] = $quotation->po_file_path
+        $data['po_download_url']   = $quotation->po_file_path
             ? Storage::url($quotation->po_file_path) : null;
 
         return response()->json(['success' => true, 'quotation' => $data]);
     }
 
-    // ── Compare — harga terendah dulu ─────────────────────────────────
+    // Compare harga terendah 
     public function compare($batchId)
     {
         $quotations = Quotation::with([
@@ -60,7 +60,7 @@ class QuotationController extends Controller
         return response()->json(['success' => true, 'quotations' => $quotations]);
     }
 
-    // ── Approve + generate PO + kirim email ke semua pihak ───────────
+    // ── Approve + PO PDF ─────────────────────────────────────────────
     public function approve(Request $request, $id)
     {
         $quotation = Quotation::with([
@@ -77,20 +77,19 @@ class QuotationController extends Controller
             ], 422);
         }
 
-        // 1. Generate PO PDF via blade view
+        // Generate PO PDF menggunakan blade view
         $poFilePath = $this->generatePoPdf($quotation);
 
-        // 2. Update pemenang
         $quotation->update([
             'status'       => 'approved',
             'note'         => $request->note ?? null,
             'po_file_path' => $poFilePath,
         ]);
 
-        // 3. Invitation pemenang → 'winner'
+        // Invitation pemenang → 'winner'
         $quotation->invitedSupplier?->update(['status' => 'winner']);
 
-        // 4. Ambil semua quotation pending lain di batch_category yang sama SEBELUM di-reject
+        // Ambil pending lain SEBELUM di-reject agar bisa kirim email
         $pendingOthers = Quotation::with(['invitedSupplier.supplier.user'])
             ->where('id_quotation', '!=', $id)
             ->where('status', 'pending')
@@ -99,20 +98,20 @@ class QuotationController extends Controller
             )
             ->get();
 
-        // 5. Auto-reject semua pending lain
+        // Auto-reject semua pending lain
         $pendingOthers->each(fn($q) => $q->update([
             'status' => 'rejected',
             'note'   => 'Penawaran lain telah dipilih.',
         ]));
 
-        // 6. Batch → closed
+        // Batch → closed
         $batch = $quotation->invitedSupplier?->batchCategory?->batch;
         if ($batch) $batch->update(['status' => 'closed']);
 
         $batchTitle = $batch?->title ?? '';
         $mail       = new MailService();
 
-        // 7.Email ke PEMENANG (approved)
+        // Email pemenang
         try {
             $winnerSupplier = $quotation->invitedSupplier?->supplier;
             if ($winnerSupplier?->user) {
@@ -126,7 +125,7 @@ class QuotationController extends Controller
             Log::warning('Email pemenang gagal: ' . $e->getMessage());
         }
 
-        // 8. Email ke semua supplier yang AUTO-REJECTED 
+        // Email ke semua supplier yang auto-rejected
         foreach ($pendingOthers as $rejected) {
             try {
                 $rejSupplier = $rejected->invitedSupplier?->supplier;
@@ -139,19 +138,19 @@ class QuotationController extends Controller
                     );
                 }
             } catch (\Exception $e) {
-                Log::warning('Email auto-reject ke ' . ($rejSupplier?->user?->email ?? '?') . ' gagal: ' . $e->getMessage());
+                Log::warning('Email auto-reject gagal: ' . $e->getMessage());
             }
         }
 
         return response()->json([
             'success'           => true,
-            'message'           => 'Penawaran disetujui! PO digenerate & notifikasi terkirim ke semua supplier.',
+            'message'           => 'Penawaran disetujui! PO digenerate & notifikasi terkirim.',
             'po_url'            => $poFilePath ? Storage::url($poFilePath) : null,
             'notified_rejected' => $pendingOthers->count(),
         ]);
     }
 
-    // ── Reject manual ─────────────────────────────────────────────────
+    // Reject manual 
     public function reject(Request $request, $id)
     {
         $request->validate(['note' => 'required|string']);
@@ -167,7 +166,6 @@ class QuotationController extends Controller
 
         $quotation->update(['status' => 'rejected', 'note' => $request->note]);
 
-        // Email ke supplier yang ditolak manual
         try {
             $supplier = $quotation->invitedSupplier?->supplier;
             if ($supplier?->user) {
@@ -185,7 +183,7 @@ class QuotationController extends Controller
         return response()->json(['success' => true, 'message' => 'Penawaran ditolak & notifikasi terkirim.']);
     }
 
-    // ── Generate PO PDF via blade view ────────────────────────────────
+    // ── Generate PO PDF
     private function generatePoPdf(Quotation $quotation): ?string
     {
         try {
@@ -196,22 +194,29 @@ class QuotationController extends Controller
             $creator  = $batch?->creator;
             $items    = $quotation->quotationItems ?? collect();
             $poNumber = 'PO-' . date('Ymd') . '-' . str_pad($quotation->id_quotation, 4, '0', STR_PAD_LEFT);
-            $today    = \Carbon\Carbon::now()->format('d F Y');
+            $today    = \Carbon\Carbon::now()->translatedFormat('d F Y');
 
-            // Pakai blade view — bukan string HTML di controller
             $html = view('pages.pdf.purchase-order', compact(
-                'quotation', 'supplier', 'user', 'batch',
-                'category', 'creator', 'items', 'poNumber', 'today'
+                'quotation',
+                'supplier',
+                'user',
+                'batch',
+                'category',
+                'creator',
+                'items',
+                'poNumber',
+                'today'
             ))->render();
 
             $opts = new Options();
             $opts->set('defaultFont', 'DejaVu Sans');
             $opts->set('isRemoteEnabled', false);
             $opts->set('isHtml5ParserEnabled', true);
+            $opts->set('isCssFloatEnabled', true);
 
             $dompdf = new Dompdf($opts);
-            $dompdf->loadHtml($html);
-            $dompdf->setPaper('A4', 'landscape');
+            $dompdf->loadHtml($html, 'UTF-8');
+            $dompdf->setPaper('A4', 'landscape'); 
             $dompdf->render();
 
             $path = 'po/po_' . $quotation->id_quotation . '_' . time() . '.pdf';
@@ -219,7 +224,7 @@ class QuotationController extends Controller
 
             return $path;
         } catch (\Exception $e) {
-            Log::error('Generate PO gagal: ' . $e->getMessage());
+            Log::error('Generate PO PDF gagal: ' . $e->getMessage());
             return null;
         }
     }

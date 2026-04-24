@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('page-title', 'Admin') — E-Quotation</title>
+    <link rel="icon" type="image/png" href="/assets/images/logo.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -31,7 +32,7 @@
                         border-b border-gray-100 dark:border-gray-800 flex-shrink-0 gap-3 min-w-0">
 
                 <img id="sidebarLogo"
-                     src="/images/logo.jpg"
+                     src="/assets/images/logo.jpg"
                      alt="Logo"
                      class="w-8 h-8 rounded-xl object-cover flex-shrink-0"
                      onerror="this.style.display='none'; document.getElementById('sidebarLogoFallback').style.display='flex';">
