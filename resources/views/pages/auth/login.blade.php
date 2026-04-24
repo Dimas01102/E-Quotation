@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Login - RFQ System</title>
+    <title>Login - E-Quotation System</title>
+    <link rel="icon" type="image/png" href="/assets/images/logo.jpg">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -337,8 +338,6 @@
                     </button>
                 </div>
             </div>
-
-
 
             <button id="login-btn" onclick="doLogin()">
                 <i id="login-spinner" class="fas fa-circle-notch animate-spin hidden"></i>

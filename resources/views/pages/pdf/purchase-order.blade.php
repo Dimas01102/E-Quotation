@@ -298,11 +298,7 @@
             <div class="sig-line">{{ $creator?->name ?? 'Admin Procurement' }}</div>
             <div class="sig-sub">Admin Procurement</div>
         </div>
-        <div class="sig-col">
-            <div class="sig-label">Diketahui oleh</div>
-            <div class="sig-line">Manager Procurement</div>
-            <div class="sig-sub">Jabatan</div>
-        </div>
+
         <div class="sig-col">
             <div class="sig-label">Diterima oleh</div>
             <div class="sig-line">{{ $user?->name ?? '-' }}</div>
