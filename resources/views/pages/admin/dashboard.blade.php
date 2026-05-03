@@ -100,8 +100,6 @@
 
 @push('scripts')
 <script>
-// ✅ TIDAK perlu deklarasikan CSRF, fmtDate, fmtRp — sudah ada di layout!
-// Langsung pakai window.CSRF(), window.fmtDate(), window.fmtRp(), window.statusBadge()
 
 async function loadDashboard() {
     try {

@@ -125,7 +125,6 @@
 </div>
 
 <script>
-const CSRF = () => document.querySelector('meta[name="csrf-token"]')?.content || '';
 let allQuotations  = [];
 let allInvitations = [];
 
