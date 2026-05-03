@@ -21,30 +21,28 @@
 
         {{-- ── Sidebar ─────────────────────────────────────────────────── --}}
         <aside id="sidebar"
-            class="fixed inset-y-0 left-0 z-40 w-64 flex flex-col
-                   bg-white dark:bg-gray-900
-                   border-r border-gray-200 dark:border-gray-800
-                   overflow-hidden"
-            style="transition: width 0.25s ease;">
+            class="fixed inset-y-0 left-0 z-50 w-64 flex flex-col
+           bg-white dark:bg-gray-900
+           transform -translate-x-full md:translate-x-0
+           transition-all duration-300">
 
             {{-- ── Logo ── --}}
-            <div class="flex items-center h-16 px-4
+            <div
+                class="flex items-center h-16 px-4
                         border-b border-gray-100 dark:border-gray-800 flex-shrink-0 gap-3 min-w-0">
 
-                <img id="sidebarLogo"
-                     src="/assets/images/logo.jpg"
-                     alt="Logo"
-                     class="w-8 h-8 rounded-xl object-cover flex-shrink-0"
-                     onerror="this.style.display='none'; document.getElementById('sidebarLogoFallback').style.display='flex';">
+                <img id="sidebarLogo" src="/assets/images/logo.jpg" alt="Logo"
+                    class="w-8 h-8 rounded-xl object-cover flex-shrink-0"
+                    onerror="this.style.display='none'; document.getElementById('sidebarLogoFallback').style.display='flex';">
 
-               
+
 
                 {{-- Label — disembunyikan saat collapsed --}}
-                <div id="sidebarLogoLabel"
-                     class="flex items-center gap-2 min-w-0 overflow-hidden"
-                     style="transition: opacity 0.2s ease, width 0.25s ease;">
+                <div id="sidebarLogoLabel" class="flex items-center gap-2 min-w-0 overflow-hidden"
+                    style="transition: opacity 0.2s ease, width 0.25s ease;">
                     <span class="font-bold text-gray-800 dark:text-white text-sm whitespace-nowrap">Dashboard</span>
-                    <span class="text-xs font-semibold px-2 py-0.5 bg-blue-100 text-blue-700
+                    <span
+                        class="text-xs font-semibold px-2 py-0.5 bg-blue-100 text-blue-700
                                  dark:bg-blue-900/30 dark:text-blue-400 rounded-full whitespace-nowrap flex-shrink-0">
                         Admin
                     </span>
@@ -63,7 +61,7 @@
                             d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                     <span class="nav-label whitespace-nowrap overflow-hidden"
-                          style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
+                        style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
                         Dashboard
                     </span>
                 </a>
@@ -77,7 +75,7 @@
                             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
                     <span class="nav-label whitespace-nowrap overflow-hidden"
-                          style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
+                        style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
                         Master Data
                     </span>
                 </a>
@@ -91,7 +89,7 @@
                             d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <span class="nav-label whitespace-nowrap overflow-hidden"
-                          style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
+                        style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
                         Supplier
                     </span>
                 </a>
@@ -105,7 +103,7 @@
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                     <span class="nav-label whitespace-nowrap overflow-hidden"
-                          style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
+                        style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
                         Batch / RFQ
                     </span>
                 </a>
@@ -119,7 +117,7 @@
                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span class="nav-label whitespace-nowrap overflow-hidden"
-                          style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
+                        style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
                         Quotation
                     </span>
                 </a>
@@ -133,7 +131,7 @@
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     <span class="nav-label whitespace-nowrap overflow-hidden"
-                          style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
+                        style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
                         Laporan
                     </span>
                 </a>
@@ -141,18 +139,20 @@
             </nav>
 
             {{-- ── Footer ── --}}
-            <div class="p-4 border-t border-gray-100 dark:border-gray-800 flex-shrink-0 overflow-hidden">
-                <p id="sidebarFooterText"
-                   class="text-xs text-gray-400 text-center whitespace-nowrap overflow-hidden"
-                   style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
+            <div id="sidebarFooter"
+                class="p-4 border-t border-gray-100 dark:border-gray-800 flex-shrink-0 overflow-hidden">
+                <p id="sidebarFooterText" class="text-xs text-gray-400 text-center whitespace-nowrap overflow-hidden"
+                    style="transition: opacity 0.2s ease, max-width 0.25s ease; max-width: 200px; opacity: 1;">
                     E-Quotation System
                 </p>
             </div>
         </aside>
 
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
+
+
         {{-- ── Main ─────────────────────────────────────────────────────── --}}
-        <div id="mainContent" class="flex-1 flex flex-col min-w-0"
-             style="margin-left: 16rem; transition: margin-left 0.25s ease;">
+        <div id="mainContent" class="flex-1 flex flex-col min-w-0 ml-0 md:ml-64 transition-all duration-300">
 
             {{-- Top Bar --}}
             <header
@@ -180,11 +180,13 @@
                     <button id="darkToggle" type="button"
                         class="w-9 h-9 flex items-center justify-center rounded-xl
                                text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <svg id="iconMoon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="iconMoon" class="w-4 h-4" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                         </svg>
-                        <svg id="iconSun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg id="iconSun" class="w-4 h-4 hidden" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 110 14A7 7 0 0112 5z" />
                         </svg>
@@ -205,8 +207,8 @@
                                        hidden sm:block max-w-[120px] truncate">
                                 Admin
                             </span>
-                            <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none"
-                                 stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 9l-7 7-7-7" />
                             </svg>
@@ -257,17 +259,16 @@
     </div>
 
     {{-- ── Edit Profile Modal ────────────────────────────────────────────── --}}
-    <div id="profileModal"
-         class="fixed inset-0 z-[60] items-center justify-center bg-black/60 backdrop-blur-sm"
-         style="display:none">
+    <div id="profileModal" class="fixed inset-0 z-[60] items-center justify-center bg-black/60 backdrop-blur-sm"
+        style="display:none">
         <div
             class="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md mx-4 shadow-2xl
                    border border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between px-6 py-4
+            <div
+                class="flex items-center justify-between px-6 py-4
                         border-b border-gray-100 dark:border-gray-800">
                 <h3 class="font-semibold text-gray-800 dark:text-white">Edit Profil Admin</h3>
-                <button onclick="closeProfileModal()"
-                        class="text-gray-400 hover:text-gray-600 transition-colors">
+                <button onclick="closeProfileModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -297,14 +298,12 @@
                     <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Ubah Password</p>
                     <p class="text-xs text-gray-400 mb-3">Kosongkan jika tidak ingin mengubah password.</p>
                     <div class="space-y-3">
-                        <input id="profilePassword" type="password"
-                               placeholder="Password baru (min. 8 karakter)"
+                        <input id="profilePassword" type="password" placeholder="Password baru (min. 8 karakter)"
                             class="w-full px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800
                                    border border-gray-200 dark:border-gray-700 rounded-xl
                                    focus:outline-none focus:ring-2 focus:ring-blue-500
                                    text-gray-800 dark:text-white">
-                        <input id="profilePasswordConfirm" type="password"
-                               placeholder="Konfirmasi password baru"
+                        <input id="profilePasswordConfirm" type="password" placeholder="Konfirmasi password baru"
                             class="w-full px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800
                                    border border-gray-200 dark:border-gray-700 rounded-xl
                                    focus:outline-none focus:ring-2 focus:ring-blue-500
@@ -334,39 +333,43 @@
         // GLOBAL HELPERS
         // ═══════════════════════════════════════════════════════════════════
 
-        window.CSRF = function () {
+        window.CSRF = function() {
             return document.querySelector('meta[name="csrf-token"]')?.content || '';
         };
         window.getCSRF = window.CSRF;
 
-        window.fmtDate = function (d) {
+        window.fmtDate = function(d) {
             if (!d) return '—';
-            return new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+            return new Date(d).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
         };
 
-        window.fmtRp = function (n) {
+        window.fmtRp = function(n) {
             if (n == null || n === '') return '—';
             return 'Rp ' + parseInt(n).toLocaleString('id-ID');
         };
 
-        window.statusBadge = window.badge = function (s) {
+        window.statusBadge = window.badge = function(s) {
             const m = {
-                open:      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                draft:     'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-                closed:    'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-                pending:   'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-                approved:  'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                rejected:  'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-                invited:   'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                open: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+                draft: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+                closed: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+                pending: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                approved: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+                rejected: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+                invited: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
                 submitted: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
-                winner:    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+                winner: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
             };
             return '<span class="px-2.5 py-1 rounded-full text-xs font-medium ' +
                 (m[s] || 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400') +
                 '">' + (s || '—') + '</span>';
         };
 
-        window.toast = function (msg, type) {
+        window.toast = function(msg, type) {
             const t = document.createElement('div');
             const bg = type === 'error' ? 'bg-red-600' : type === 'info' ? 'bg-blue-600' : 'bg-green-600';
             t.className = 'fixed bottom-5 right-5 px-5 py-3 rounded-xl text-white text-sm z-[9999] shadow-xl ' + bg;
@@ -375,12 +378,12 @@
             setTimeout(() => t.remove(), 3500);
         };
 
-        window.showModal = function (id) {
+        window.showModal = function(id) {
             const el = document.getElementById(id);
             if (!el) return;
             el.style.display = 'flex';
         };
-        window.hideModal = function (id) {
+        window.hideModal = function(id) {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
         };
@@ -388,112 +391,138 @@
         // ═══════════════════════════════════════════════════════════════════
         // SIDEBAR COLLAPSE (icon-only ↔ expanded)
         // ═══════════════════════════════════════════════════════════════════
-        (function () {
+        // ═══════════════════════════════════════════════════════════════════
+        // SIDEBAR COLLAPSE (icon-only ↔ expanded)
+        // ═══════════════════════════════════════════════════════════════════
+        (function() {
             const STORAGE_KEY = 'sb_admin_collapsed';
-            const EXPANDED_W  = '16rem';   // w-64
-            const COLLAPSED_W = '4rem';    // w-16
 
-            function isCollapsed() {
-                return localStorage.getItem(STORAGE_KEY) === '1';
+            function isMobile() {
+                return window.innerWidth < 768;
             }
 
-            function applyState(collapsed) {
-                const sidebar  = document.getElementById('sidebar');
-                const main     = document.getElementById('mainContent');
-                const labels   = document.querySelectorAll('.nav-label');
-                const logoLbl  = document.getElementById('sidebarLogoLabel');
-                const footer   = document.getElementById('sidebarFooterText');
-
+            // Terapkan state yang benar sesuai kondisi viewport saat ini
+            function applyDesktopState() {
+                const sidebar = document.getElementById('sidebar');
+                const main = document.getElementById('mainContent');
+                const footer = document.getElementById('sidebarFooter');
                 if (!sidebar || !main) return;
 
+                const collapsed = localStorage.getItem(STORAGE_KEY) === '1';
+
                 if (collapsed) {
-                    // Sidebar menyempit ke icon-only
-                    sidebar.style.width = COLLAPSED_W;
-                    main.style.marginLeft = COLLAPSED_W;
-
-                    // Sembunyikan semua label teks
-                    labels.forEach(el => {
-                        el.style.opacity  = '0';
-                        el.style.maxWidth = '0';
-                    });
-                    if (logoLbl) {
-                        logoLbl.style.opacity  = '0';
-                        logoLbl.style.width    = '0';
-                        logoLbl.style.overflow = 'hidden';
-                    }
-                    if (footer) {
-                        footer.style.opacity  = '0';
-                        footer.style.maxWidth = '0';
-                    }
-
-                    // Pusatkan icon di nav link
-                    document.querySelectorAll('.nav-link').forEach(a => {
-                        a.style.justifyContent = 'center';
-                        a.style.paddingLeft    = '0';
-                        a.style.paddingRight   = '0';
-                    });
-
+                    sidebar.style.width = '4rem';
+                    main.classList.remove('md:ml-64');
+                    main.classList.add('md:ml-16');
+                    if (footer) footer.style.display = 'none'; // ← sembunyikan
                 } else {
-                    // Sidebar expanded
-                    sidebar.style.width = EXPANDED_W;
-                    main.style.marginLeft = EXPANDED_W;
-
-                    // Tampilkan semua label teks
-                    labels.forEach(el => {
-                        el.style.opacity  = '1';
-                        el.style.maxWidth = '200px';
-                    });
-                    if (logoLbl) {
-                        logoLbl.style.opacity  = '1';
-                        logoLbl.style.width    = '';
-                        logoLbl.style.overflow = 'hidden';
-                    }
-                    if (footer) {
-                        footer.style.opacity  = '1';
-                        footer.style.maxWidth = '200px';
-                    }
-
-                    // Kembalikan padding nav link
-                    document.querySelectorAll('.nav-link').forEach(a => {
-                        a.style.justifyContent = '';
-                        a.style.paddingLeft    = '';
-                        a.style.paddingRight   = '';
-                    });
+                    sidebar.style.width = '16rem';
+                    main.classList.remove('md:ml-16');
+                    main.classList.add('md:ml-64');
+                    if (footer) footer.style.display = ''; // ← tampilkan
                 }
             }
 
-            document.addEventListener('DOMContentLoaded', function () {
-                // Terapkan state awal
-                applyState(isCollapsed());
+            function applyMobileState() {
+                const sidebar = document.getElementById('sidebar');
+                const main = document.getElementById('mainContent');
+                const overlay = document.getElementById('sidebarOverlay');
+                const footer = document.getElementById('sidebarFooter');
+                if (!sidebar || !main) return;
 
-                // Tombol toggle
-                const btn = document.getElementById('sidebarToggle');
-                if (btn) {
-                    btn.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        const next = !isCollapsed();
-                        localStorage.setItem(STORAGE_KEY, next ? '1' : '0');
-                        applyState(next);
-                    });
+                sidebar.style.width = '';
+                sidebar.classList.add('-translate-x-full');
+                if (overlay) overlay.classList.add('hidden');
+                main.classList.remove('md:ml-64', 'md:ml-16');
+                if (footer) footer.style.display = 'none'; // ← sembunyikan di mobile
+            }
+
+            // Reset semua inline style dan class saat di-mobile
+            function applyMobileState() {
+                const sidebar = document.getElementById('sidebar');
+                const main = document.getElementById('mainContent');
+                const overlay = document.getElementById('sidebarOverlay');
+                if (!sidebar || !main) return;
+
+                // Hapus width inline yang di-set oleh desktop logic
+                sidebar.style.width = '';
+
+                // Pastikan sidebar tersembunyi (mobile default: off-screen)
+                sidebar.classList.add('-translate-x-full');
+                if (overlay) overlay.classList.add('hidden');
+
+                // Reset margin main content ke default mobile (tanpa ml)
+                main.classList.remove('md:ml-64', 'md:ml-16');
+            }
+
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                const main = document.getElementById('mainContent');
+                const footer = document.getElementById('sidebarFooter');
+                if (!sidebar || !main) return;
+
+                if (isMobile()) {
+                    const isHidden = sidebar.classList.contains('-translate-x-full');
+                    sidebar.classList.toggle('-translate-x-full', !isHidden);
+                    if (overlay) overlay.classList.toggle('hidden', !isHidden);
+                    if (footer) footer.style.display = isHidden ? '' : 'none'; // ← toggle footer
+                    return;
                 }
+
+                const collapsed = localStorage.getItem(STORAGE_KEY) === '1';
+                localStorage.setItem(STORAGE_KEY, collapsed ? '0' : '1');
+                applyDesktopState();
+            }
+
+            // Saat resize antar breakpoint, terapkan ulang state yang sesuai
+            function handleResize() {
+                if (isMobile()) {
+                    applyMobileState();
+                } else {
+                    // Desktop: pastikan sidebar tidak tertahan di -translate-x-full dari mobile
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar) sidebar.classList.remove('-translate-x-full');
+                    applyDesktopState();
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const btn = document.getElementById('sidebarToggle');
+                const overlay = document.getElementById('sidebarOverlay');
+
+                if (btn) btn.addEventListener('click', toggleSidebar);
+                if (overlay) overlay.addEventListener('click', toggleSidebar);
+
+                // Terapkan state awal
+                if (isMobile()) {
+                    applyMobileState();
+                } else {
+                    const sidebar = document.getElementById('sidebar');
+                    if (sidebar) sidebar.classList.remove('-translate-x-full');
+                    applyDesktopState();
+                }
+
+                // Pantau perubahan ukuran window
+                window.addEventListener('resize', handleResize);
             });
         })();
 
         // ── Dark Mode ─────────────────────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', function () {
-            const btn  = document.getElementById('darkToggle');
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('darkToggle');
             const moon = document.getElementById('iconMoon');
-            const sun  = document.getElementById('iconSun');
+            const sun = document.getElementById('iconSun');
 
             function applyDark(isDark) {
                 document.documentElement.classList.toggle('dark', isDark);
                 if (moon) moon.classList.toggle('hidden', isDark);
-                if (sun)  sun.classList.toggle('hidden', !isDark);
+                if (sun) sun.classList.toggle('hidden', !isDark);
             }
 
             applyDark(localStorage.getItem('darkMode') === 'true');
 
-            if (btn) btn.addEventListener('click', function () {
+            if (btn) btn.addEventListener('click', function() {
                 const isDark = document.documentElement.classList.toggle('dark');
                 localStorage.setItem('darkMode', isDark);
                 applyDark(isDark);
@@ -501,111 +530,138 @@
         });
 
         // ── Active Nav Link ───────────────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', function () {
-            const path  = window.location.pathname;
+        document.addEventListener('DOMContentLoaded', function() {
+            const path = window.location.pathname;
             const links = document.querySelectorAll('.nav-link');
-            links.forEach(function (a) {
+            links.forEach(function(a) {
                 const p = a.getAttribute('data-path');
                 if (p && path.includes(p)) {
-                    a.classList.add('bg-blue-50', 'dark:bg-blue-900/30', 'text-blue-700', 'dark:text-blue-400');
+                    a.classList.add('bg-blue-50', 'dark:bg-blue-900/30', 'text-blue-700',
+                        'dark:text-blue-400');
                     a.classList.remove('text-gray-600', 'dark:text-gray-400');
                 }
             });
         });
 
         // ── User Dropdown + load user info ────────────────────────────────
-        document.addEventListener('DOMContentLoaded', function () {
-            const btn      = document.getElementById('userMenuBtn');
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('userMenuBtn');
             const dropdown = document.getElementById('userDropdown');
             if (!btn || !dropdown) return;
 
-            btn.addEventListener('click', function (e) {
+            btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const vis = dropdown.style.display !== 'none' && dropdown.style.display !== '';
                 dropdown.style.display = vis ? 'none' : 'block';
             });
 
-            document.addEventListener('click', function (e) {
+            document.addEventListener('click', function(e) {
                 if (!document.getElementById('userMenuWrapper')?.contains(e.target)) {
                     dropdown.style.display = 'none';
                 }
             });
 
             fetch('/api/auth/me', {
-                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() }
-            })
-            .then(r => r.ok ? r.json() : null)
-            .then(data => {
-                if (!data) return;
-                const name   = data.name || 'Admin';
-                const email  = data.email || '';
-                const avatar = name.charAt(0).toUpperCase();
-                const set    = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-                set('userName',     name);
-                set('userAvatar',   avatar);
-                set('dropdownName', name);
-                set('dropdownEmail', email);
-            })
-            .catch(() => {});
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': CSRF()
+                    }
+                })
+                .then(r => r.ok ? r.json() : null)
+                .then(data => {
+                    if (!data) return;
+                    const name = data.name || 'Admin';
+                    const email = data.email || '';
+                    const avatar = name.charAt(0).toUpperCase();
+                    const set = (id, val) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = val;
+                    };
+                    set('userName', name);
+                    set('userAvatar', avatar);
+                    set('dropdownName', name);
+                    set('dropdownEmail', email);
+                })
+                .catch(() => {});
         });
 
         // ── Logout ────────────────────────────────────────────────────────
-        window.doLogout = async function () {
+        window.doLogout = async function() {
             try {
                 await fetch('/api/logout', {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': CSRF(), 'Accept': 'application/json' }
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF(),
+                        'Accept': 'application/json'
+                    }
                 });
             } catch (e) {}
             window.location.href = '/login';
         };
 
         // ── Edit Profile Modal ────────────────────────────────────────────
-        window.openProfileModal = function () {
+        window.openProfileModal = function() {
             document.getElementById('userDropdown').style.display = 'none';
 
             fetch('/api/auth/me', {
-                headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() }
-            })
-            .then(r => r.ok ? r.json() : {})
-            .then(data => {
-                document.getElementById('profileName').value            = data.name  || '';
-                document.getElementById('profileEmail').value           = data.email || '';
-                document.getElementById('profilePassword').value        = '';
-                document.getElementById('profilePasswordConfirm').value = '';
-                document.getElementById('profileAlert').classList.add('hidden');
-            });
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': CSRF()
+                    }
+                })
+                .then(r => r.ok ? r.json() : {})
+                .then(data => {
+                    document.getElementById('profileName').value = data.name || '';
+                    document.getElementById('profileEmail').value = data.email || '';
+                    document.getElementById('profilePassword').value = '';
+                    document.getElementById('profilePasswordConfirm').value = '';
+                    document.getElementById('profileAlert').classList.add('hidden');
+                });
 
             document.getElementById('profileModal').style.display = 'flex';
         };
 
-        window.closeProfileModal = function () {
+        window.closeProfileModal = function() {
             document.getElementById('profileModal').style.display = 'none';
         };
 
-        window.saveProfile = async function () {
-            const name   = document.getElementById('profileName').value.trim();
-            const pw     = document.getElementById('profilePassword').value;
+        window.saveProfile = async function() {
+            const name = document.getElementById('profileName').value.trim();
+            const pw = document.getElementById('profilePassword').value;
             const pwConf = document.getElementById('profilePasswordConfirm').value;
             const alertEl = document.getElementById('profileAlert');
 
             function showAlert(msg, ok) {
-                alertEl.className = 'p-3 rounded-xl text-sm ' + (ok
-                    ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400'
-                    : 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400');
+                alertEl.className = 'p-3 rounded-xl text-sm ' + (ok ?
+                    'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400' :
+                    'bg-red-50 text-red-700 border border-red-200 dark:bg-red-900/20 dark:text-red-400');
                 alertEl.textContent = msg;
                 alertEl.classList.remove('hidden');
             }
 
-            if (!name)                  { showAlert('Nama wajib diisi.');                       return; }
-            if (pw && pw.length < 8)    { showAlert('Password minimal 8 karakter.');            return; }
-            if (pw && pw !== pwConf)    { showAlert('Konfirmasi password tidak cocok.');         return; }
+            if (!name) {
+                showAlert('Nama wajib diisi.');
+                return;
+            }
+            if (pw && pw.length < 8) {
+                showAlert('Password minimal 8 karakter.');
+                return;
+            }
+            if (pw && pw !== pwConf) {
+                showAlert('Konfirmasi password tidak cocok.');
+                return;
+            }
 
-            const body = { name };
-            if (pw) { body.password = pw; body.password_confirmation = pwConf; }
+            const body = {
+                name
+            };
+            if (pw) {
+                body.password = pw;
+                body.password_confirmation = pwConf;
+            }
 
             try {
-                const res  = await fetch('/api/admin/profile', {
+                const res = await fetch('/api/admin/profile', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -618,15 +674,18 @@
 
                 if (res.ok && json.success) {
                     showAlert('Profil berhasil diperbarui!', true);
-                    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-                    set('userName',     name);
-                    set('userAvatar',   name.charAt(0).toUpperCase());
+                    const set = (id, val) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = val;
+                    };
+                    set('userName', name);
+                    set('userAvatar', name.charAt(0).toUpperCase());
                     set('dropdownName', name);
                     setTimeout(closeProfileModal, 1500);
                 } else {
-                    const msg = json.errors
-                        ? Object.values(json.errors).flat().join(' ')
-                        : (json.message || 'Gagal menyimpan.');
+                    const msg = json.errors ?
+                        Object.values(json.errors).flat().join(' ') :
+                        (json.message || 'Gagal menyimpan.');
                     showAlert(msg);
                 }
             } catch (e) {
@@ -634,9 +693,9 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('profileModal');
-            if (modal) modal.addEventListener('click', function (e) {
+            if (modal) modal.addEventListener('click', function(e) {
                 if (e.target === modal) closeProfileModal();
             });
         });
