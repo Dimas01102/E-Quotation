@@ -198,7 +198,7 @@
                             class="flex items-center gap-2 px-3 py-1.5 rounded-xl
                                    hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
                             <div id="userAvatar"
-                                class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center
+                                class="w-7 h-7 rounded-lg bg-green-600 flex items-center justify-center
                                        text-white text-xs font-bold flex-shrink-0">
                                 A
                             </div>
@@ -536,8 +536,12 @@
             links.forEach(function(a) {
                 const p = a.getAttribute('data-path');
                 if (p && path.includes(p)) {
-                    a.classList.add('bg-blue-50', 'dark:bg-blue-900/30', 'text-blue-700',
-                        'dark:text-blue-400');
+                    a.classList.add(
+                        'bg-green-50',
+                        'dark:bg-green-900/30',
+                        'text-green-700',
+                        'dark:text-green-400'
+                    );
                     a.classList.remove('text-gray-600', 'dark:text-gray-400');
                 }
             });
