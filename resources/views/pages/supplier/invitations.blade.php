@@ -105,14 +105,9 @@
         async function loadInvitations() {
             try {
                 const res = await fetch('/api/supplier/rfq', {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
+                    headers: { 'Accept': 'application/json' }
                 });
-                if (res.status === 401) {
-                    window.location.href = '/login';
-                    return;
-                }
+                if (res.status === 401) { window.location.href = '/login'; return; }
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const json = await res.json();
                 allInvitations = json.invitations || [];
@@ -138,19 +133,67 @@
             document.getElementById('listState').classList.remove('hidden');
 
             document.getElementById('listState').innerHTML = list.map(inv => {
-                const batch = inv.batch || {};
+                const batch    = inv.batch || {};
                 const category = inv.category || {};
-                const quotation = inv.quotation;
-                const deadline = batch.deadline ? new Date(batch.deadline) : null;
-                const isExpired = deadline && deadline < new Date();
+                const quotation      = inv.quotation;        // null jika winner & can_submit
+                const latestQuotation = inv.latest_quotation; // selalu quotation terakhir
+                const isExpired  = inv.deadline_passed;
+                const isWinner   = inv.is_winner;
+                const canSubmit  = inv.can_submit;
+
+                // Pesan info untuk winner yang batch-nya dibuka ulang
+                const winnerReopenBanner = isWinner && canSubmit ? `
+                    <div class="mt-3 flex items-start gap-2 px-3 py-2.5 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
+                        <svg class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <div>
+                            <p class="text-xs font-semibold text-amber-700 dark:text-amber-400">Pengadaan Dibuka Kembali</p>
+                            <p class="text-xs text-amber-600 dark:text-amber-500 mt-0.5">Anda adalah pemenang sebelumnya. Admin meminta Anda mengajukan penawaran ulang.</p>
+                        </div>
+                    </div>` : '';
+
+                // Tampilkan info penawaran sebelumnya jika winner & can_submit (latestQuotation ada)
+                const prevQuotationInfo = isWinner && canSubmit && latestQuotation ? `
+                    <div class="mt-2 inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs text-gray-500 dark:text-gray-400">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Penawaran terakhir: ${fmtRp(latestQuotation.total_price)} · ${latestQuotation.status}
+                    </div>` : '';
+
+                // Info penawaran sudah terkirim (supplier biasa, bukan winner re-submit)
+                const submittedInfo = quotation && !canSubmit ? `
+                    <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 rounded-xl text-xs text-green-700 dark:text-green-400 font-medium">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Penawaran sudah dikirim · ${fmtRp(quotation.total_price)}
+                    </div>` : '';
+
+                // Tombol aksi di kanan
+                const actionButtons = (() => {
+                    if (canSubmit) {
+                        // Bisa submit (termasuk winner re-submit)
+                        return `
+                        <a href="/supplier/quotations"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            ${isWinner ? 'Ajukan Ulang' : 'Ajukan Penawaran'}
+                        </a>`;
+                    }
+                    if (!quotation && isExpired) {
+                        return `
+                        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-lg text-xs">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Deadline lewat
+                        </span>`;
+                    }
+                    return '';
+                })();
 
                 return `
-        <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5 hover:border-blue-300 dark:hover:border-blue-700 transition-colors ${isWinner && canSubmit ? 'border-amber-300 dark:border-amber-700' : ''}">
             <div class="flex items-start justify-between gap-4">
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap mb-1">
                         <span class="text-xs text-gray-400 font-mono">No. RFQ: ${batch.batch_number || '—'}</span>
                         <span class="px-2 py-0.5 rounded-full text-xs font-medium ${statusCls[inv.status] || 'bg-gray-100 text-gray-600'}">${inv.status || '—'}</span>
+                        ${isWinner ? '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-xs font-medium">🏆 Pemenang</span>' : ''}
                         ${isExpired ? '<span class="px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs">Expired</span>' : ''}
                     </div>
                     <h3 class="font-semibold text-gray-800 dark:text-white">${batch.title || '—'}</h3>
@@ -159,11 +202,9 @@
                         <span>Deadline: <strong class="${isExpired ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${fmtDate(batch.deadline)}</strong></span>
                         <span>Diundang: ${fmtDate(inv.invited_at)}</span>
                     </div>
-                    ${quotation ? `
-                        <div class="mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-green-50 dark:bg-green-900/20 rounded-xl text-xs text-green-700 dark:text-green-400 font-medium">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            Penawaran sudah dikirim · ${fmtRp(quotation.total_price)}
-                        </div>` : ''}
+                    ${winnerReopenBanner}
+                    ${prevQuotationInfo}
+                    ${submittedInfo}
                 </div>
                 <div class="flex flex-col gap-2 flex-shrink-0">
                     <button onclick="showDetail(${inv.id_invited_supplier})"
@@ -171,17 +212,7 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         Lihat Detail
                     </button>
-                    ${!quotation && inv.can_submit ? `
-                        <a href="/supplier/quotations"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition-colors">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            Ajukan Penawaran
-                        </a>` : ''}
-                    ${!quotation && !inv.can_submit && isExpired ? `
-                        <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-400 rounded-lg text-xs">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Deadline lewat
-                        </span>` : ''}
+                    ${actionButtons}
                 </div>
             </div>
         </div>`;
@@ -197,9 +228,13 @@
         function showDetail(id) {
             const inv = allInvitations.find(x => x.id_invited_supplier == id);
             if (!inv) return;
-            const batch = inv.batch || {};
+            const batch    = inv.batch || {};
             const category = inv.category || {};
-            const items = inv.items || [];
+            const items    = inv.items || [];
+            const isWinner  = inv.is_winner;
+            const canSubmit = inv.can_submit;
+            // Untuk modal: selalu pakai latest_quotation sebagai referensi history
+            const displayQuotation = inv.latest_quotation;
 
             document.getElementById('modalBatchTitle').textContent = batch.title || 'Detail';
             document.getElementById('modalContent').innerHTML = `
@@ -211,7 +246,7 @@
                 </div>
                 <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Deskripsi</p><p class="text-gray-700 dark:text-gray-300">${batch.description || '—'}</p></div>
                 <div><p class="text-xs text-gray-400 mb-1">Kategori</p><p class="font-medium text-gray-800 dark:text-white">${category.name || '—'}</p></div>
-                <div><p class="text-xs text-gray-400 mb-1">Deadline</p><p class="font-medium text-gray-800 dark:text-white">${fmtDate(batch.deadline)}</p></div>
+                <div><p class="text-xs text-gray-400 mb-1">Deadline</p><p class="font-medium ${inv.deadline_passed ? 'text-red-500' : 'text-gray-800 dark:text-white'}">${fmtDate(batch.deadline)}${inv.deadline_passed ? ' <span class="text-xs font-normal">(Lewat)</span>' : ''}</p></div>
             </div>
             ${items.length ? `
                 <div>
@@ -235,23 +270,43 @@
                         </table>
                     </div>
                 </div>` : ''}
-            ${inv.quotation ? `
+
+            ${/* Winner yang batch-nya dibuka ulang → tampilkan riwayat + tombol ajukan ulang */ ''}
+            ${isWinner && canSubmit ? `
+                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+                    <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase mb-2">🏆 Pengadaan Dibuka Ulang — Anda Pemenang Sebelumnya</p>
+                    ${displayQuotation ? `
+                    <div class="grid grid-cols-2 gap-3 text-sm mb-3">
+                        <div><p class="text-xs text-gray-400">Penawaran Terakhir</p><p class="font-bold text-gray-800 dark:text-white">${fmtRp(displayQuotation.total_price)}</p></div>
+                        <div><p class="text-xs text-gray-400">Status Lama</p>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">approved</span>
+                        </div>
+                    </div>` : ''}
+                    <p class="text-xs text-amber-600 dark:text-amber-500 mb-3">Admin meminta Anda mengajukan penawaran baru. Silakan upload file penawaran terbaru di halaman Penawaran Saya.</p>
+                    <a href="/supplier/quotations"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        Ajukan Penawaran Ulang →
+                    </a>
+                </div>`
+
+            : displayQuotation ? `
                 <div class="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
                     <p class="text-xs font-semibold text-green-700 dark:text-green-400 uppercase mb-2">Status Penawaran Anda</p>
                     <div class="grid grid-cols-2 gap-3 text-sm">
-                        <div><p class="text-xs text-gray-400">Total Harga</p><p class="font-bold text-gray-800 dark:text-white">${fmtRp(inv.quotation.total_price)}</p></div>
+                        <div><p class="text-xs text-gray-400">Total Harga</p><p class="font-bold text-gray-800 dark:text-white">${fmtRp(displayQuotation.total_price)}</p></div>
                         <div><p class="text-xs text-gray-400">Status</p>
                             <span class="px-2 py-0.5 rounded-full text-xs font-medium ${
-                                inv.quotation.status === 'approved' ? 'bg-green-100 text-green-700' :
-                                inv.quotation.status === 'rejected' ? 'bg-red-100 text-red-600' :
+                                displayQuotation.status === 'approved' ? 'bg-green-100 text-green-700' :
+                                displayQuotation.status === 'rejected' ? 'bg-red-100 text-red-600' :
                                 'bg-amber-100 text-amber-700'
-                            }">${inv.quotation.status}</span>
+                            }">${displayQuotation.status}</span>
                         </div>
                     </div>
                 </div>` : `
                 <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800 text-center">
                     <p class="text-sm text-blue-700 dark:text-blue-400 font-medium">Belum ada penawaran</p>
-                    ${inv.can_submit ? `
+                    ${canSubmit ? `
                 <a href="/supplier/quotations" class="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors">
                     Ajukan Penawaran di halaman Penawaran Saya →
                 </a>` : '<p class="text-xs text-blue-500 mt-1">Pengajuan tidak tersedia saat ini.</p>'}

@@ -33,6 +33,12 @@
 
         <div id="alertForm" class="hidden mb-4 p-3 rounded-xl text-sm"></div>
 
+        <!-- Info ketika tidak ada undangan yang tersedia -->
+        <div id="noInvitationInfo" class="hidden mb-4 p-3 rounded-xl text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500">
+            <svg class="w-4 h-4 inline mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Tidak ada undangan yang tersedia untuk diajukan saat ini (semua sudah disubmit atau deadline sudah lewat).
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="md:col-span-2">
                 <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
@@ -40,7 +46,7 @@
                 </label>
                 <select id="inviteSelect"
                     class="w-full px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white">
-                    <option value="">-- Pilih undangan RFQ yang belum disubmit --</option>
+                    <option value="">-- Pilih undangan RFQ --</option>
                 </select>
             </div>
             <div>
@@ -159,27 +165,52 @@ async function loadTemplates() {
     }
 }
 
-// ─── Load invitations (undangan yang belum submit) ─────────────────────
+// ─── Load invitations untuk dropdown ──────────────────────────────────
 async function loadInvitations() {
     try {
         const res  = await fetch('/api/supplier/rfq', { headers: { 'Accept': 'application/json' } });
         const json = await res.json();
-        allInvitations = (json.invitations || []).filter(inv => !inv.has_submitted);
+
+        /*
+         * Filter invitation yang boleh muncul di dropdown:
+         * 1. can_submit === true   → artinya backend sudah validasi: batch open, deadline belum lewat,
+         *    tidak ada pending/submitted aktif, dan status invitation 'invited'
+         *    (termasuk winner yang batch-nya di-reopen)
+         *
+         * TIDAK perlu cek deadline di sini karena can_submit sudah meng-cover semua kondisi.
+         * Invitation dengan deadline lewat → can_submit = false → tidak masuk dropdown.
+         */
+        allInvitations = (json.invitations || []).filter(inv => inv.can_submit === true);
         populateInviteSelect();
     } catch(e) {}
 }
 
 function populateInviteSelect() {
-    const sel = document.getElementById('inviteSelect');
-    sel.innerHTML = '<option value="">-- Pilih undangan RFQ yang belum disubmit --</option>';
+    const sel     = document.getElementById('inviteSelect');
+    const noInvEl = document.getElementById('noInvitationInfo');
+
+    sel.innerHTML = '<option value="">-- Pilih undangan RFQ --</option>';
+
     if (!allInvitations.length) {
-        sel.innerHTML += '<option disabled>Tidak ada undangan yang belum disubmit</option>';
+        // Tidak ada undangan yang bisa disubmit → tampilkan info, sembunyikan form fields
+        noInvEl.classList.remove('hidden');
+        sel.closest('.grid').classList.add('hidden');
+        document.getElementById('btnSubmit').classList.add('hidden');
         return;
     }
+
+    // Ada undangan → pastikan form visible
+    noInvEl.classList.add('hidden');
+    sel.closest('.grid').classList.remove('hidden');
+    document.getElementById('btnSubmit').classList.remove('hidden');
+
     allInvitations.forEach(inv => {
-        const batch = inv.batch || {};
-        const cat   = inv.category || {};
-        sel.innerHTML += `<option value="${inv.id_invited_supplier}">${batch.batch_number || ''} — ${batch.title || '—'} (${cat.name || ''})</option>`;
+        const batch  = inv.batch || {};
+        const cat    = inv.category || {};
+        const label  = inv.is_winner
+            ? `🏆 [Ulang] ${batch.batch_number || ''} — ${batch.title || '—'} (${cat.name || ''})`
+            : `${batch.batch_number || ''} — ${batch.title || '—'} (${cat.name || ''})`;
+        sel.innerHTML += `<option value="${inv.id_invited_supplier}">${label}</option>`;
     });
 }
 
