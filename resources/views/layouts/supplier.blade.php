@@ -38,7 +38,7 @@
             <div class="flex h-16 flex-shrink-0 items-center gap-3 px-1
                         border-b border-gray-100 dark:border-gray-800">
                 <a href="/supplier/dashboard" class="flex items-center gap-3 min-w-0">
-                    <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <div class="w-9 h-9 bg-green-600 rounded-xl flex items-center justify-center flex-shrink-0">
                         <i class="fas fa-shopping-cart text-white text-sm"></i>
                     </div>
                     <div id="sidebarLogoLabel"
@@ -54,7 +54,7 @@
             <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden py-4" id="sidebarNav">
                 @php
                     $seg    = request()->segment(2) ?? '';
-                    $active = 'nav-link flex items-center gap-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 px-3 py-2.5 text-sm font-semibold text-blue-700 dark:text-blue-400';
+                    $active = 'nav-link flex items-center gap-3 rounded-xl bg-green-50 dark:bg-green-900/20 px-3 py-2.5 text-sm font-semibold text-green-700 dark:text-green-400';
                     $normal = 'nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white';
                     $ni     = fn(bool $on) => $on ? $active : $normal;
                 @endphp
@@ -179,7 +179,7 @@
                     {{-- User info --}}
                     <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl
                                 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                        <div class="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center
+                        <div class="w-7 h-7 rounded-lg bg-green-600 flex items-center justify-center
                                     text-white text-xs font-bold flex-shrink-0">
                             S
                         </div>
