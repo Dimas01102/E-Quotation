@@ -9,6 +9,8 @@
     <link rel="icon" type="image/png" href="/assets/images/logo.jpg">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
@@ -400,6 +402,17 @@
             const r = await res.json();
 
             if (r.success) {
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Login Berhasil!',
+                    text: `Selamat datang ${r.name}. Anda akan diarahkan...`,
+                    timer: 1500,
+                    timerProgressBar: true,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.getPopup().style.borderRadius = '16px';
+                    },
+                });
                 window.location.href = r.redirect;
             } else {
                 showError(r.message || 'Login gagal.');

@@ -46,6 +46,7 @@ class AuthController extends Controller
         return response()->json([
             'success'  => true,
             'message'  => 'Login berhasil.',
+            'name'     => $user->name,
             'role'     => $user->role,
             'redirect' => $user->role === 'admin' ? '/admin/dashboard' : '/supplier/dashboard',
         ]);
