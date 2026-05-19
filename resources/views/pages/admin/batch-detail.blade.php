@@ -380,595 +380,517 @@
 @endsection
 
 @push('scripts')
-    <script>
-        const batchId = window.location.pathname.split('/').pop();
-        let batchData = null;
-        let allMasterCats = [],
-            allMasterItems = [],
-            allActiveSuppliers = [],
-            batchCategories = [];
+<script>
+    const batchId = window.location.pathname.split('/').pop();
+    let batchData = null;
+    let allMasterCats = [],
+        allMasterItems = [],
+        allActiveSuppliers = [],
+        batchCategories = [];
 
-        const statusCls = {
-            draft: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-            open: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-            closed: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
-        };
-        const invCls = {
-            invited: 'bg-blue-100 text-blue-700',
-            submitted: 'bg-green-100 text-green-700',
-            winner: 'bg-yellow-100 text-yellow-700'
-        };
-        const quotCls = {
-            pending: 'bg-amber-100 text-amber-700',
-            approved: 'bg-green-100 text-green-700',
-            rejected: 'bg-red-100 text-red-600'
-        };
+    const statusCls = {
+        draft: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+        open: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+        closed: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+    };
+    const invCls = {
+        invited: 'bg-blue-100 text-blue-700',
+        submitted: 'bg-green-100 text-green-700',
+        winner: 'bg-yellow-100 text-yellow-700'
+    };
+    const quotCls = {
+        pending: 'bg-amber-100 text-amber-700',
+        approved: 'bg-green-100 text-green-700',
+        rejected: 'bg-red-100 text-red-600'
+    };
 
-        function showModal(id) {
-            const el = document.getElementById(id);
-            el.style.removeProperty('display');
-            el.style.display = 'flex';
+    // ✅ Timezone-safe: pakai waktu lokal browser, bukan UTC
+    function getTodayStr() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+    }
+
+    function showModal(id) {
+        const el = document.getElementById(id);
+        el.style.removeProperty('display');
+        el.style.display = 'flex';
+    }
+
+    function hideModal(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    function CSRF() {
+        return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    }
+
+    function fmtDate(val) {
+        if (!val) return '—';
+        const d = new Date(val);
+        if (isNaN(d)) return val;
+        return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function fmtRp(val) {
+        if (val === null || val === undefined || val === '') return '—';
+        return 'Rp ' + Number(val).toLocaleString('id-ID');
+    }
+
+    async function loadBatch() {
+        try {
+            const res = await fetch(`/api/admin/batches/${batchId}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.message || 'Error');
+            batchData = json;
+            batchCategories = json.batch_categories || [];
+
+            const b = json.batch;
+            document.getElementById('batchTitle').textContent = b.title;
+            document.getElementById('batchNumber').textContent = 'No. RFQ: ' + b.batch_number;
+            document.getElementById('infoDeadline').textContent = fmtDate(b.deadline);
+            document.getElementById('infoCreator').textContent = b.creator?.name || '—';
+            document.getElementById('infoInvited').textContent = (json.invited_suppliers || []).length;
+            document.getElementById('infoQuotations').textContent = (json.quotations || []).length;
+
+            const badge = document.getElementById('batchStatusBadge');
+            badge.textContent = b.status?.toUpperCase();
+            badge.className = 'px-2.5 py-1 rounded-full text-xs font-medium ' + (statusCls[b.status] || 'bg-gray-100 text-gray-600');
+
+            renderCatList(batchCategories);
+            renderSupTable(json.invited_suppliers || []);
+            renderQuotTable(json.quotations || []);
+        } catch (e) {
+            document.getElementById('pageWrap').innerHTML =
+                `<div class="text-center py-10 text-red-400">Gagal memuat: ${e.message}</div>`;
         }
+    }
 
-        function hideModal(id) {
-            document.getElementById(id).style.display = 'none';
+    async function loadMasterData() {
+        const [cr, ir, sr] = await Promise.all([
+            fetch('/api/admin/master-categories', { headers: { 'Accept': 'application/json' } }),
+            fetch('/api/admin/master-items', { headers: { 'Accept': 'application/json' } }),
+            fetch('/api/admin/suppliers', { headers: { 'Accept': 'application/json' } }),
+        ]);
+        allMasterCats = (await cr.json()).categories || [];
+        allMasterItems = (await ir.json()).items || [];
+        allActiveSuppliers = ((await sr.json()).suppliers || []).filter(s => Number(s.user?.is_active) === 1);
+    }
+
+    function renderCatList(cats) {
+        const el = document.getElementById('catList');
+        if (!cats.length) {
+            el.innerHTML =
+                '<div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 text-center text-gray-400 text-sm">Belum ada kategori.</div>';
+            return;
         }
-
-        async function loadBatch() {
-            try {
-                const res = await fetch(`/api/admin/batches/${batchId}`, {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                const json = await res.json();
-                if (!res.ok) throw new Error(json.message || 'Error');
-                batchData = json;
-                batchCategories = json.batch_categories || [];
-
-                const b = json.batch;
-                document.getElementById('batchTitle').textContent = b.title;
-                document.getElementById('batchNumber').textContent = 'No. RFQ: ' + b.batch_number;
-                document.getElementById('infoDeadline').textContent = fmtDate(b.deadline);
-                document.getElementById('infoCreator').textContent = b.creator?.name || '—';
-                document.getElementById('infoInvited').textContent = (json.invited_suppliers || []).length;
-                document.getElementById('infoQuotations').textContent = (json.quotations || []).length;
-
-                const badge = document.getElementById('batchStatusBadge');
-                badge.textContent = b.status?.toUpperCase();
-                badge.className = 'px-2.5 py-1 rounded-full text-xs font-medium ' + (statusCls[b.status] ||
-                    'bg-gray-100 text-gray-600');
-
-                renderCatList(batchCategories);
-                renderSupTable(json.invited_suppliers || []);
-                renderQuotTable(json.quotations || []);
-            } catch (e) {
-                document.getElementById('pageWrap').innerHTML =
-                    `<div class="text-center py-10 text-red-400">Gagal memuat: ${e.message}</div>`;
-            }
-        }
-
-        async function loadMasterData() {
-            const [cr, ir, sr] = await Promise.all([
-                fetch('/api/admin/master-categories', {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                }),
-                fetch('/api/admin/master-items', {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                }),
-                fetch('/api/admin/suppliers', {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                }),
-            ]);
-            allMasterCats = (await cr.json()).categories || [];
-            allMasterItems = (await ir.json()).items || [];
-            allActiveSuppliers = ((await sr.json()).suppliers || []).filter(s => Number(s.user?.is_active) === 1);
-        }
-
-        function renderCatList(cats) {
-            const el = document.getElementById('catList');
-            if (!cats.length) {
-                el.innerHTML =
-                    '<div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 text-center text-gray-400 text-sm">Belum ada kategori.</div>';
-                return;
-            }
-            el.innerHTML = cats.map(function(c) {
-                var items = c.item_batch_categories || c.itemBatchCategories || [];
-                var catName = (c.master_category?.name) || (c.masterCategory?.name) || '—';
-                var itemRows = items.map(function(item) {
-                    var mi = item.master_item || item.masterItem || {};
-                    return '<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">' +
-                        '<td class="px-5 py-3"><span class="font-mono text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">' +
-                        (mi.item_code || '—') + '</span></td>' +
-                        '<td class="px-5 py-3 font-medium text-gray-800 dark:text-white text-sm">' + (mi
-                            .item_name || '—') + '</td>' +
-                        '<td class="px-5 py-3 text-gray-500 text-sm">' + (mi.unit || '—') + '</td>' +
-                        '<td class="px-5 py-3 text-center font-semibold text-gray-800 dark:text-white">' +
-                        item.quantity + '</td>' +
-                        '<td class="px-5 py-3 text-right"><button onclick="deleteItem(' + c
-                        .id_batch_category + ',' + item.id_item_batch_category +
-                        ')" class="px-3 py-1 text-xs text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">Hapus</button></td></tr>';
-                }).join('');
-                return '<div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">' +
-                    '<div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40">' +
-                    '<div class="flex items-center gap-3"><span class="px-2.5 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-xs font-medium">' +
-                    catName + '</span>' +
-                    '<span class="text-xs text-gray-400">' + items.length + ' item</span></div>' +
-                    '<div class="flex gap-2">' +
-                    '<button onclick="openAddItem(' + c.id_batch_category +
-                    ')" class="px-3 py-1.5 text-xs font-medium bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors">+ Tambah Item</button>' +
-                    '<button onclick="deleteCat(' + c.id_batch_category +
-                    ')" class="px-3 py-1.5 text-xs font-medium bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors">Hapus Kategori</button>' +
-                    '</div></div>' +
-                    (items.length ?
-                        '<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-gray-100 dark:border-gray-800">' +
-                        '<th class="text-left px-5 py-3 text-xs font-semibold text-gray-500">Kode</th>' +
-                        '<th class="text-left px-5 py-3 text-xs font-semibold text-gray-500">Nama Item</th>' +
-                        '<th class="text-left px-5 py-3 text-xs font-semibold text-gray-500">Satuan</th>' +
-                        '<th class="text-center px-5 py-3 text-xs font-semibold text-gray-500">Qty</th>' +
-                        '<th class="text-right px-5 py-3 text-xs font-semibold text-gray-500">Aksi</th>' +
-                        '</tr></thead><tbody>' + itemRows + '</tbody></table></div>' :
-                        '<p class="px-5 py-4 text-xs text-gray-400">Belum ada item.</p>') +
-                    '</div>';
-            }).join('');
-        }
-
-        function renderSupTable(list) {
-            const tb = document.getElementById('supTable');
-            if (!list.length) {
-                tb.innerHTML =
-                    '<tr><td colspan="5" class="px-5 py-6 text-center text-gray-400 text-sm">Belum ada supplier diundang.</td></tr>';
-                return;
-            }
-            tb.innerHTML = list.map((inv, i) => {
-                var catName = inv.batch_category?.master_category?.name || inv.batchCategory?.masterCategory
-                    ?.name || '—';
+        el.innerHTML = cats.map(function(c) {
+            var items = c.item_batch_categories || c.itemBatchCategories || [];
+            var catName = (c.master_category?.name) || (c.masterCategory?.name) || '—';
+            var itemRows = items.map(function(item) {
+                var mi = item.master_item || item.masterItem || {};
                 return '<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">' +
-                    '<td class="px-5 py-3.5 text-xs text-gray-400">' + (i + 1) + '</td>' +
-                    '<td class="px-5 py-3.5"><p class="font-medium text-gray-800 dark:text-white text-sm">' + (inv
-                        .supplier?.company_name || '—') + '</p>' +
-                    '<p class="text-xs text-gray-400">' + (inv.supplier?.user?.email || '') + '</p></td>' +
-                    '<td class="px-5 py-3.5 text-sm text-gray-500">' + catName + '</td>' +
-                    '<td class="px-5 py-3.5 text-xs text-gray-400">' + fmtDate(inv.invited_at) + '</td>' +
-                    '<td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (invCls[
-                        inv.status] || 'bg-gray-100 text-gray-500') + '">' + (inv.status || '—') +
-                    '</span></td></tr>';
+                    '<td class="px-5 py-3"><span class="font-mono text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">' +
+                    (mi.item_code || '—') + '</span></td>' +
+                    '<td class="px-5 py-3 font-medium text-gray-800 dark:text-white text-sm">' + (mi.item_name || '—') + '</td>' +
+                    '<td class="px-5 py-3 text-gray-500 text-sm">' + (mi.unit || '—') + '</td>' +
+                    '<td class="px-5 py-3 text-center font-semibold text-gray-800 dark:text-white">' + item.quantity + '</td>' +
+                    '<td class="px-5 py-3 text-right"><button onclick="deleteItem(' + c.id_batch_category + ',' + item.id_item_batch_category +
+                    ')" class="px-3 py-1 text-xs text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">Hapus</button></td></tr>';
             }).join('');
-        }
+            return '<div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">' +
+                '<div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40">' +
+                '<div class="flex items-center gap-3"><span class="px-2.5 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-xs font-medium">' +
+                catName + '</span>' +
+                '<span class="text-xs text-gray-400">' + items.length + ' item</span></div>' +
+                '<div class="flex gap-2">' +
+                '<button onclick="openAddItem(' + c.id_batch_category + ')" class="px-3 py-1.5 text-xs font-medium bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors">+ Tambah Item</button>' +
+                '<button onclick="deleteCat(' + c.id_batch_category + ')" class="px-3 py-1.5 text-xs font-medium bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors">Hapus Kategori</button>' +
+                '</div></div>' +
+                (items.length ?
+                    '<div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b border-gray-100 dark:border-gray-800">' +
+                    '<th class="text-left px-5 py-3 text-xs font-semibold text-gray-500">Kode</th>' +
+                    '<th class="text-left px-5 py-3 text-xs font-semibold text-gray-500">Nama Item</th>' +
+                    '<th class="text-left px-5 py-3 text-xs font-semibold text-gray-500">Satuan</th>' +
+                    '<th class="text-center px-5 py-3 text-xs font-semibold text-gray-500">Qty</th>' +
+                    '<th class="text-right px-5 py-3 text-xs font-semibold text-gray-500">Aksi</th>' +
+                    '</tr></thead><tbody>' + itemRows + '</tbody></table></div>' :
+                    '<p class="px-5 py-4 text-xs text-gray-400">Belum ada item.</p>') +
+                '</div>';
+        }).join('');
+    }
 
-        function renderQuotTable(list) {
-            const tb = document.getElementById('quotTable');
-            if (!list.length) {
-                tb.innerHTML =
-                    '<tr><td colspan="6" class="px-5 py-6 text-center text-gray-400 text-sm">Belum ada penawaran masuk.</td></tr>';
-                return;
+    function renderSupTable(list) {
+        const tb = document.getElementById('supTable');
+        if (!list.length) {
+            tb.innerHTML =
+                '<tr><td colspan="5" class="px-5 py-6 text-center text-gray-400 text-sm">Belum ada supplier diundang.</td></tr>';
+            return;
+        }
+        tb.innerHTML = list.map((inv, i) => {
+            var catName = inv.batch_category?.master_category?.name || inv.batchCategory?.masterCategory?.name || '—';
+            return '<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">' +
+                '<td class="px-5 py-3.5 text-xs text-gray-400">' + (i + 1) + '</td>' +
+                '<td class="px-5 py-3.5"><p class="font-medium text-gray-800 dark:text-white text-sm">' + (inv.supplier?.company_name || '—') + '</p>' +
+                '<p class="text-xs text-gray-400">' + (inv.supplier?.user?.email || '') + '</p></td>' +
+                '<td class="px-5 py-3.5 text-sm text-gray-500">' + catName + '</td>' +
+                '<td class="px-5 py-3.5 text-xs text-gray-400">' + fmtDate(inv.invited_at) + '</td>' +
+                '<td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (invCls[inv.status] || 'bg-gray-100 text-gray-500') + '">' + (inv.status || '—') + '</span></td></tr>';
+        }).join('');
+    }
+
+    function renderQuotTable(list) {
+        const tb = document.getElementById('quotTable');
+        if (!list.length) {
+            tb.innerHTML =
+                '<tr><td colspan="6" class="px-5 py-6 text-center text-gray-400 text-sm">Belum ada penawaran masuk.</td></tr>';
+            return;
+        }
+        tb.innerHTML = list.map((q, i) => {
+            var actions = '';
+            if (q.status === 'pending') {
+                actions = '<button onclick="doApprove(' + q.id_quotation + ')" class="px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg text-xs font-medium mr-1">Approve</button>' +
+                    '<button onclick="doReject(' + q.id_quotation + ')" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-medium">Reject</button>';
+            } else if (q.status === 'approved' && q.po_file_path) {
+                actions = '<a href="/storage/' + q.po_file_path + '" target="_blank" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-xs font-medium">Download PO</a>';
             }
-            tb.innerHTML = list.map((q, i) => {
-                var actions = '';
-                if (q.status === 'pending') {
-                    actions = '<button onclick="doApprove(' + q.id_quotation +
-                        ')" class="px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg text-xs font-medium mr-1">Approve</button>' +
-                        '<button onclick="doReject(' + q.id_quotation +
-                        ')" class="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs font-medium">Reject</button>';
-                } else if (q.status === 'approved' && q.po_file_path) {
-                    actions = '<a href="/storage/' + q.po_file_path +
-                        '" target="_blank" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-xs font-medium">Download PO</a>';
-                }
-                return '<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">' +
-                    '<td class="px-5 py-3.5 text-xs text-gray-400">' + (i + 1) + '</td>' +
-                    '<td class="px-5 py-3.5"><p class="font-medium text-gray-800 dark:text-white text-sm">' + (q
-                        .invited_supplier?.supplier?.company_name || '—') + '</p></td>' +
-                    '<td class="px-5 py-3.5">' + (q.file_path ? '<a href="/storage/' + q.file_path +
-                        '" target="_blank" class="text-blue-600 hover:underline text-xs">' + (q.file_name ||
-                            'Download') + '</a>' : '—') + '</td>' +
-                    '<td class="px-5 py-3.5 text-right font-semibold ' + (q.status === 'approved' ?
-                        'text-green-600' : 'text-gray-800 dark:text-white') + '">' + fmtRp(q.total_price) +
-                    '</td>' +
-                    '<td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (quotCls[
-                        q.status] || '') + '">' + (q.status || '—') + '</span></td>' +
-                    '<td class="px-5 py-3.5 text-right"><div class="flex items-center justify-end gap-2">' +
-                    actions + '</div></td></tr>';
-            }).join('');
+            return '<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">' +
+                '<td class="px-5 py-3.5 text-xs text-gray-400">' + (i + 1) + '</td>' +
+                '<td class="px-5 py-3.5"><p class="font-medium text-gray-800 dark:text-white text-sm">' + (q.invited_supplier?.supplier?.company_name || '—') + '</p></td>' +
+                '<td class="px-5 py-3.5">' + (q.file_path ? '<a href="/storage/' + q.file_path + '" target="_blank" class="text-blue-600 hover:underline text-xs">' + (q.file_name || 'Download') + '</a>' : '—') + '</td>' +
+                '<td class="px-5 py-3.5 text-right font-semibold ' + (q.status === 'approved' ? 'text-green-600' : 'text-gray-800 dark:text-white') + '">' + fmtRp(q.total_price) + '</td>' +
+                '<td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (quotCls[q.status] || '') + '">' + (q.status || '—') + '</span></td>' +
+                '<td class="px-5 py-3.5 text-right"><div class="flex items-center justify-end gap-2">' + actions + '</div></td></tr>';
+        }).join('');
+    }
+
+    function switchTab(tab) {
+        ['cat', 'sup', 'quot'].forEach(t => {
+            document.getElementById('pane' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = t === tab ? '' : 'none';
+            document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+        });
+    }
+
+    // ─── Edit Batch ───────────────────────────────────────────────────────
+    function openEditBatch() {
+        const b = batchData?.batch;
+        if (!b) return;
+        document.getElementById('editTitle').value = b.title;
+        document.getElementById('editDesc').value = b.description || '';
+        document.getElementById('editDeadline').value = b.deadline ? b.deadline.toString().substring(0, 10) : '';
+        document.getElementById('editDeadline').min = getTodayStr(); // ✅ fix
+        document.getElementById('editStatus').value = b.status;
+        document.getElementById('alertEdit').classList.add('hidden');
+        showModal('modalEdit');
+    }
+
+    async function saveBatch() {
+        const title    = document.getElementById('editTitle').value.trim();
+        const deadline = document.getElementById('editDeadline').value;
+        const status   = document.getElementById('editStatus').value;
+        const desc     = document.getElementById('editDesc').value.trim();
+
+        if (!title || !deadline) {
+            setAlert('alertEdit', 'Judul dan deadline wajib.');
+            return;
         }
 
-        // ─── Tab ──────────────────────────────────────────────────────────────
-        function switchTab(tab) {
-            ['cat', 'sup', 'quot'].forEach(t => {
-                document.getElementById('pane' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = t === tab ?
-                    '' : 'none';
-                document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active',
-                    t === tab);
-            });
+        // ✅ Validasi client-side timezone-safe
+        if (deadline < getTodayStr()) {
+            setAlert('alertEdit', 'Deadline tidak boleh tanggal yang sudah lewat.');
+            return;
         }
 
-        // ─── Edit Batch ───────────────────────────────────────────────────────
-        function openEditBatch() {
-            const b = batchData?.batch;
-            if (!b) return;
-            document.getElementById('editTitle').value = b.title;
-            document.getElementById('editDesc').value = b.description || '';
-            document.getElementById('editDeadline').value = b.deadline ? b.deadline.toString().substring(0, 10) : '';
-            document.getElementById('editDeadline').min = new Date().toISOString().split('T')[0];
-            document.getElementById('editStatus').value = b.status;
-            document.getElementById('alertEdit').classList.add('hidden');
-            showModal('modalEdit');
-        }
-        async function saveBatch() {
-            const title = document.getElementById('editTitle').value.trim();
-            const deadline = document.getElementById('editDeadline').value;
-            const status = document.getElementById('editStatus').value;
-            const desc = document.getElementById('editDesc').value.trim();
-            if (!title || !deadline) {
-                setAlert('alertEdit', 'Judul dan deadline wajib.');
-                return;
-            }
-            try {
-                const res = await fetch('/api/admin/batches/' + batchId, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': CSRF()
-                    },
-                    body: JSON.stringify({
-                        title,
-                        description: desc,
-                        deadline,
-                        status
-                    })
-                });
-                const json = await res.json();
-                if (!res.ok || !json.success) {
-                    setAlert('alertEdit', json.message || 'Gagal.');
-                    return;
-                }
-                hideModal('modalEdit');
-                toast('Batch diperbarui');
-                await loadBatch();
-            } catch (e) {
-                setAlert('alertEdit', 'Kesalahan.');
-            }
-        }
-
-        // ─── Kategori ─────────────────────────────────────────────────────────
-        function openAddCat() {
-            document.getElementById('catSel').innerHTML = '<option value="">-- Pilih --</option>' +
-                allMasterCats.map(c => '<option value="' + c.id_master_category + '">' + c.name + '</option>').join('');
-            document.getElementById('alertCat').classList.add('hidden');
-            showModal('modalCat');
-        }
-        async function addCat() {
-            const catId = document.getElementById('catSel').value;
-            if (!catId) {
-                setAlert('alertCat', 'Pilih kategori.');
-                return;
-            }
-            const res = await fetch('/api/admin/batches/' + batchId + '/categories', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': CSRF()
-                },
-                body: JSON.stringify({
-                    id_master_category: catId
-                })
-            });
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                setAlert('alertCat', json.message || 'Gagal.');
-                return;
-            }
-            hideModal('modalCat');
-            toast('Kategori ditambahkan');
-            await loadBatch();
-        }
-        async function deleteCat(catId) {
-            if (!confirm('Hapus kategori ini? Semua item terkait juga terhapus.')) return;
-            const res = await fetch('/api/admin/batches/' + batchId + '/categories/' + catId, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': CSRF()
-                }
-            });
-            const json = await res.json();
-            if (res.ok && json.success) {
-                toast('Kategori dihapus');
-                await loadBatch();
-            } else toast(json.message || 'Gagal', 'error');
-        }
-
-        // ─── Item ─────────────────────────────────────────────────────────────
-        function openAddItem(catId) {
-            document.getElementById('activeCatId').value = catId;
-            document.getElementById('itemSel').innerHTML = '<option value="">-- Pilih Item --</option>' +
-                allMasterItems.map(i => '<option value="' + i.id_item + '">' + i.item_code + ' — ' + i.item_name + ' (' + i
-                    .unit + ')</option>').join('');
-            document.getElementById('itemQty').value = '';
-            document.getElementById('alertItem').classList.add('hidden');
-            showModal('modalItem');
-        }
-        async function addItem() {
-            const catId = document.getElementById('activeCatId').value;
-            const itemId = document.getElementById('itemSel').value;
-            const qty = document.getElementById('itemQty').value;
-            if (!itemId || !qty) {
-                setAlert('alertItem', 'Pilih item dan isi quantity.');
-                return;
-            }
-            const res = await fetch('/api/admin/batches/' + batchId + '/categories/' + catId + '/items', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': CSRF()
-                },
-                body: JSON.stringify({
-                    id_item: itemId,
-                    quantity: qty
-                })
-            });
-            const json = await res.json();
-            if (!res.ok || !json.success) {
-                setAlert('alertItem', json.message || 'Gagal.');
-                return;
-            }
-            hideModal('modalItem');
-            toast('Item ditambahkan');
-            await loadBatch();
-        }
-        async function deleteItem(catId, itemId) {
-            if (!confirm('Hapus item ini?')) return;
-            const res = await fetch('/api/admin/batches/' + batchId + '/categories/' + catId + '/items/' + itemId, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': CSRF()
-                }
-            });
-            const json = await res.json();
-            if (res.ok && json.success) {
-                toast('Item dihapus');
-                await loadBatch();
-            } else toast(json.message || 'Gagal', 'error');
-        }
-
-        // ─── ✅ Invite Supplier — Multi-select semua sekaligus ─────────────────
-        function openInvite() {
-            document.getElementById('invCatSel').innerHTML = '<option value="">-- Pilih kategori --</option>' +
-                batchCategories.map(c => {
-                    var name = c.master_category?.name || c.masterCategory?.name || c.id_batch_category;
-                    return '<option value="' + c.id_batch_category + '">' + name + '</option>';
-                }).join('');
-
-            // Render daftar supplier dengan checkbox
-            renderSupplierCheckList();
-            updateInviteCount();
-            document.getElementById('alertInvite').classList.add('hidden');
-            showModal('modalInvite');
-        }
-
-        function renderSupplierCheckList() {
-            const container = document.getElementById('supplierCheckList');
-            if (!allActiveSuppliers.length) {
-                container.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Tidak ada supplier aktif.</div>';
-                return;
-            }
-            container.innerHTML = allActiveSuppliers.map((s, i) => `
-        <label class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/40 cursor-pointer border-b border-gray-100 dark:border-gray-800 last:border-0 transition-colors">
-            <input type="checkbox" class="supplier-chk rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                value="${s.id}" onchange="updateInviteCount()">
-            <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-800 dark:text-white truncate">${s.company_name || '—'}</p>
-                <p class="text-xs text-gray-400 truncate">${s.user?.name || ''} · ${s.user?.email || ''}</p>
-            </div>
-        </label>`).join('');
-        }
-
-        function selectAllSuppliers(checked) {
-            document.querySelectorAll('.supplier-chk').forEach(cb => cb.checked = checked);
-            updateInviteCount();
-        }
-
-        function updateInviteCount() {
-            const count = document.querySelectorAll('.supplier-chk:checked').length;
-            document.getElementById('inviteSelectedCount').textContent =
-                count > 0 ? count + ' supplier dipilih' : '';
-        }
-
-        async function doInviteAll() {
-            const catId = document.getElementById('invCatSel').value;
-            const checked = [...document.querySelectorAll('.supplier-chk:checked')].map(cb => cb.value);
-
-            if (!catId) {
-                setAlert('alertInvite', 'Pilih kategori batch.');
-                return;
-            }
-            if (!checked.length) {
-                setAlert('alertInvite', 'Pilih minimal 1 supplier.');
-                return;
-            }
-
-            const btn = document.getElementById('btnInviteAll');
-            btn.disabled = true;
-            btn.innerHTML =
-                '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Mengirim...';
-
-            let success = 0,
-                skip = 0,
-                fail = 0;
-
-            // Kirim satu per satu secara paralel (Promise.allSettled)
-            const results = await Promise.allSettled(
-                checked.map(supId =>
-                    fetch('/api/admin/batches/' + batchId + '/invite', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': CSRF()
-                        },
-                        body: JSON.stringify({
-                            id_supplier: supId,
-                            id_batch_category: catId
-                        })
-                    }).then(r => r.json().then(j => ({
-                        ok: r.ok,
-                        ...j
-                    })))
-                )
-            );
-
-            results.forEach(r => {
-                if (r.status === 'fulfilled') {
-                    if (r.value.success) success++;
-                    else if (r.value.message?.includes('sudah diundang')) skip++;
-                    else fail++;
-                } else fail++;
-            });
-
-            btn.disabled = false;
-            btn.innerHTML =
-                '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Undang &amp; Kirim Email';
-
-            let msg = success + ' supplier berhasil diundang';
-            if (skip) msg += ' · ' + skip + ' sudah diundang';
-            if (fail) msg += ' · ' + fail + ' gagal';
-
-            hideModal('modalInvite');
-            toast(msg, success > 0 ? 'success' : 'error');
-            await loadBatch();
-        }
-
-        // ─── Compare ──────────────────────────────────────────────────────────
-        async function compareAll() {
-            try {
-                const res = await fetch('/api/admin/quotations/compare/' + batchId, {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                const json = await res.json();
-                const list = json.quotations || [];
-
-                if (!list.length) {
-                    toast('Belum ada penawaran untuk dibandingkan.', 'error');
-                    return;
-                }
-
-                const lowestPrice = parseFloat(list[0]?.total_price || 0);
-                document.getElementById('compareContent').innerHTML =
-                    '<div class="overflow-x-auto"><table class="w-full text-sm">' +
-                    '<thead class="bg-gray-50 dark:bg-gray-800/60"><tr>' +
-                    '<th class="text-left px-4 py-3 text-xs font-semibold text-gray-500">Rank</th>' +
-                    '<th class="text-left px-4 py-3 text-xs font-semibold text-gray-500">Supplier</th>' +
-                    '<th class="text-right px-4 py-3 text-xs font-semibold text-gray-500">Total Harga</th>' +
-                    '<th class="text-center px-4 py-3 text-xs font-semibold text-gray-500">Status</th>' +
-                    '<th class="text-right px-4 py-3 text-xs font-semibold text-gray-500">Aksi</th>' +
-                    '</tr></thead><tbody>' +
-                    list.map(function(q, i) {
-                        var isLowest = parseFloat(q.total_price) === lowestPrice && q.status !== 'rejected';
-                        var rankBg = i === 0 && q.status !== 'rejected' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-gray-100 text-gray-500';
-                        var actions = '';
-                        if (q.status === 'pending') {
-                            actions = '<button onclick="doApprove(' + q.id_quotation +
-                                ');hideModal(\'compareModal\')" class="px-2.5 py-1 bg-green-50 hover:bg-green-100 text-green-600 rounded text-xs mr-1">Approve</button>' +
-                                '<button onclick="doReject(' + q.id_quotation +
-                                ');hideModal(\'compareModal\')" class="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded text-xs">Reject</button>';
-                        } else if (q.status === 'approved' && q.po_file_path) {
-                            actions = '<a href="/storage/' + q.po_file_path +
-                                '" target="_blank" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded text-xs">PO</a>';
-                        }
-                        return '<tr class="border-t border-gray-100 dark:border-gray-800 ' + (isLowest ?
-                                'bg-green-50/30' : '') + '">' +
-                            '<td class="px-4 py-3"><span class="w-7 h-7 inline-flex items-center justify-center rounded-lg text-xs font-bold ' +
-                            rankBg + '">' + (i === 0 && q.status !== 'rejected' ? '🥇' : i + 1) + '</span></td>' +
-                            '<td class="px-4 py-3"><p class="font-medium text-sm text-gray-800 dark:text-white">' +
-                            (q.invited_supplier?.supplier?.company_name || '—') + '</p></td>' +
-                            '<td class="px-4 py-3 text-right"><p class="font-bold text-sm ' + (isLowest ?
-                                'text-green-600' : 'text-gray-800') + '">' + fmtRp(q.total_price) + '</p>' + (
-                                isLowest ? '<p class="text-green-500 text-xs">Terendah ✓</p>' : '') + '</td>' +
-                            '<td class="px-4 py-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' +
-                            (quotCls[q.status] || '') + '">' + q.status + '</span></td>' +
-                            '<td class="px-4 py-3 text-right">' + actions + '</td></tr>';
-                    }).join('') + '</tbody></table></div>';
-                showModal('compareModal');
-            } catch (e) {
-                toast('Gagal: ' + e.message, 'error');
-            }
-        }
-
-        // ─── Approve / Reject ─────────────────────────────────────────────────
-        async function doApprove(id) {
-            if (!confirm('Setujui penawaran ini? PO akan digenerate otomatis.')) return;
-            const res = await fetch('/api/admin/quotations/' + id + '/approve', {
+        try {
+            const res = await fetch('/api/admin/batches/' + batchId, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': CSRF()
                 },
-                body: JSON.stringify({
-                    note: ''
-                })
+                body: JSON.stringify({ title, description: desc, deadline, status })
             });
             const json = await res.json();
-            if (res.ok && json.success) {
-                toast('Approved! PO digenerate.');
-                await loadBatch();
-            } else toast(json.message || 'Gagal', 'error');
+            if (!res.ok || !json.success) {
+                const errMsg = json.errors
+                    ? Object.values(json.errors).flat().join(' ')
+                    : (json.message || 'Gagal.');
+                setAlert('alertEdit', errMsg);
+                return;
+            }
+            hideModal('modalEdit');
+            toast('Batch diperbarui');
+            await loadBatch();
+        } catch (e) {
+            setAlert('alertEdit', 'Kesalahan.');
         }
-        async function doReject(id) {
-            const note = prompt('Alasan penolakan (wajib):');
-            if (!note) return;
-            const res = await fetch('/api/admin/quotations/' + id + '/reject', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': CSRF()
-                },
-                body: JSON.stringify({
-                    note
-                })
-            });
+    }
+
+    // ─── Kategori ─────────────────────────────────────────────────────────
+    function openAddCat() {
+        document.getElementById('catSel').innerHTML = '<option value="">-- Pilih --</option>' +
+            allMasterCats.map(c => '<option value="' + c.id_master_category + '">' + c.name + '</option>').join('');
+        document.getElementById('alertCat').classList.add('hidden');
+        showModal('modalCat');
+    }
+
+    async function addCat() {
+        const catId = document.getElementById('catSel').value;
+        if (!catId) { setAlert('alertCat', 'Pilih kategori.'); return; }
+        const res = await fetch('/api/admin/batches/' + batchId + '/categories', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+            body: JSON.stringify({ id_master_category: catId })
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) { setAlert('alertCat', json.message || 'Gagal.'); return; }
+        hideModal('modalCat');
+        toast('Kategori ditambahkan');
+        await loadBatch();
+    }
+
+    async function deleteCat(catId) {
+        if (!confirm('Hapus kategori ini? Semua item terkait juga terhapus.')) return;
+        const res = await fetch('/api/admin/batches/' + batchId + '/categories/' + catId, {
+            method: 'DELETE',
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() }
+        });
+        const json = await res.json();
+        if (res.ok && json.success) { toast('Kategori dihapus'); await loadBatch(); }
+        else toast(json.message || 'Gagal', 'error');
+    }
+
+    // ─── Item ─────────────────────────────────────────────────────────────
+    function openAddItem(catId) {
+        document.getElementById('activeCatId').value = catId;
+        document.getElementById('itemSel').innerHTML = '<option value="">-- Pilih Item --</option>' +
+            allMasterItems.map(i => '<option value="' + i.id_item + '">' + i.item_code + ' — ' + i.item_name + ' (' + i.unit + ')</option>').join('');
+        document.getElementById('itemQty').value = '';
+        document.getElementById('alertItem').classList.add('hidden');
+        showModal('modalItem');
+    }
+
+    async function addItem() {
+        const catId  = document.getElementById('activeCatId').value;
+        const itemId = document.getElementById('itemSel').value;
+        const qty    = document.getElementById('itemQty').value;
+        if (!itemId || !qty) { setAlert('alertItem', 'Pilih item dan isi quantity.'); return; }
+        const res = await fetch('/api/admin/batches/' + batchId + '/categories/' + catId + '/items', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+            body: JSON.stringify({ id_item: itemId, quantity: qty })
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) { setAlert('alertItem', json.message || 'Gagal.'); return; }
+        hideModal('modalItem');
+        toast('Item ditambahkan');
+        await loadBatch();
+    }
+
+    async function deleteItem(catId, itemId) {
+        if (!confirm('Hapus item ini?')) return;
+        const res = await fetch('/api/admin/batches/' + batchId + '/categories/' + catId + '/items/' + itemId, {
+            method: 'DELETE',
+            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() }
+        });
+        const json = await res.json();
+        if (res.ok && json.success) { toast('Item dihapus'); await loadBatch(); }
+        else toast(json.message || 'Gagal', 'error');
+    }
+
+    // ─── Invite Supplier ──────────────────────────────────────────────────
+    function openInvite() {
+        document.getElementById('invCatSel').innerHTML = '<option value="">-- Pilih kategori --</option>' +
+            batchCategories.map(c => {
+                var name = c.master_category?.name || c.masterCategory?.name || c.id_batch_category;
+                return '<option value="' + c.id_batch_category + '">' + name + '</option>';
+            }).join('');
+        renderSupplierCheckList();
+        updateInviteCount();
+        document.getElementById('alertInvite').classList.add('hidden');
+        showModal('modalInvite');
+    }
+
+    function renderSupplierCheckList() {
+        const container = document.getElementById('supplierCheckList');
+        if (!allActiveSuppliers.length) {
+            container.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Tidak ada supplier aktif.</div>';
+            return;
+        }
+        container.innerHTML = allActiveSuppliers.map((s) => `
+    <label class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/40 cursor-pointer border-b border-gray-100 dark:border-gray-800 last:border-0 transition-colors">
+        <input type="checkbox" class="supplier-chk rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            value="${s.id}" onchange="updateInviteCount()">
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-800 dark:text-white truncate">${s.company_name || '—'}</p>
+            <p class="text-xs text-gray-400 truncate">${s.user?.name || ''} · ${s.user?.email || ''}</p>
+        </div>
+    </label>`).join('');
+    }
+
+    function selectAllSuppliers(checked) {
+        document.querySelectorAll('.supplier-chk').forEach(cb => cb.checked = checked);
+        updateInviteCount();
+    }
+
+    function updateInviteCount() {
+        const count = document.querySelectorAll('.supplier-chk:checked').length;
+        document.getElementById('inviteSelectedCount').textContent = count > 0 ? count + ' supplier dipilih' : '';
+    }
+
+    async function doInviteAll() {
+        const catId   = document.getElementById('invCatSel').value;
+        const checked = [...document.querySelectorAll('.supplier-chk:checked')].map(cb => cb.value);
+
+        if (!catId)         { setAlert('alertInvite', 'Pilih kategori batch.'); return; }
+        if (!checked.length){ setAlert('alertInvite', 'Pilih minimal 1 supplier.'); return; }
+
+        const btn = document.getElementById('btnInviteAll');
+        btn.disabled = true;
+        btn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Mengirim...';
+
+        let success = 0, skip = 0, fail = 0;
+        const results = await Promise.allSettled(
+            checked.map(supId =>
+                fetch('/api/admin/batches/' + batchId + '/invite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+                    body: JSON.stringify({ id_supplier: supId, id_batch_category: catId })
+                }).then(r => r.json().then(j => ({ ok: r.ok, ...j })))
+            )
+        );
+
+        results.forEach(r => {
+            if (r.status === 'fulfilled') {
+                if (r.value.success) success++;
+                else if (r.value.message?.includes('sudah diundang')) skip++;
+                else fail++;
+            } else fail++;
+        });
+
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Undang &amp; Kirim Email';
+
+        let msg = success + ' supplier berhasil diundang';
+        if (skip) msg += ' · ' + skip + ' sudah diundang';
+        if (fail) msg += ' · ' + fail + ' gagal';
+
+        hideModal('modalInvite');
+        toast(msg, success > 0 ? 'success' : 'error');
+        await loadBatch();
+    }
+
+    // ─── Compare ──────────────────────────────────────────────────────────
+    async function compareAll() {
+        try {
+            const res  = await fetch('/api/admin/quotations/compare/' + batchId, { headers: { 'Accept': 'application/json' } });
             const json = await res.json();
-            if (res.ok && json.success) {
-                toast('Penawaran ditolak.');
-                await loadBatch();
-            } else toast(json.message || 'Gagal', 'error');
-        }
+            const list = json.quotations || [];
 
-        async function sendReminder() {
-            if (!confirm('Kirim email reminder ke supplier pemenang di batch ini?')) return;
-            const res = await fetch('/api/admin/batches/' + batchId + '/send-reminder', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': CSRF()
-                },
-                body: JSON.stringify({})
-            });
-            const json = await res.json();
-            if (res.ok && json.success) toast('Reminder terkirim!');
-            else toast(json.message || 'Gagal', 'error');
-        }
+            if (!list.length) { toast('Belum ada penawaran untuk dibandingkan.', 'error'); return; }
 
-        function setAlert(id, msg) {
-            const el = document.getElementById(id);
-            el.textContent = msg;
-            el.classList.remove('hidden');
+            const lowestPrice = parseFloat(list[0]?.total_price || 0);
+            document.getElementById('compareContent').innerHTML =
+                '<div class="overflow-x-auto"><table class="w-full text-sm">' +
+                '<thead class="bg-gray-50 dark:bg-gray-800/60"><tr>' +
+                '<th class="text-left px-4 py-3 text-xs font-semibold text-gray-500">Rank</th>' +
+                '<th class="text-left px-4 py-3 text-xs font-semibold text-gray-500">Supplier</th>' +
+                '<th class="text-right px-4 py-3 text-xs font-semibold text-gray-500">Total Harga</th>' +
+                '<th class="text-center px-4 py-3 text-xs font-semibold text-gray-500">Status</th>' +
+                '<th class="text-right px-4 py-3 text-xs font-semibold text-gray-500">Aksi</th>' +
+                '</tr></thead><tbody>' +
+                list.map(function(q, i) {
+                    var isLowest = parseFloat(q.total_price) === lowestPrice && q.status !== 'rejected';
+                    var rankBg   = i === 0 && q.status !== 'rejected' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500';
+                    var actions  = '';
+                    if (q.status === 'pending') {
+                        actions = '<button onclick="doApprove(' + q.id_quotation + ');hideModal(\'compareModal\')" class="px-2.5 py-1 bg-green-50 hover:bg-green-100 text-green-600 rounded text-xs mr-1">Approve</button>' +
+                            '<button onclick="doReject(' + q.id_quotation + ');hideModal(\'compareModal\')" class="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded text-xs">Reject</button>';
+                    } else if (q.status === 'approved' && q.po_file_path) {
+                        actions = '<a href="/storage/' + q.po_file_path + '" target="_blank" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded text-xs">PO</a>';
+                    }
+                    return '<tr class="border-t border-gray-100 dark:border-gray-800 ' + (isLowest ? 'bg-green-50/30' : '') + '">' +
+                        '<td class="px-4 py-3"><span class="w-7 h-7 inline-flex items-center justify-center rounded-lg text-xs font-bold ' + rankBg + '">' + (i === 0 && q.status !== 'rejected' ? '🥇' : i + 1) + '</span></td>' +
+                        '<td class="px-4 py-3"><p class="font-medium text-sm text-gray-800 dark:text-white">' + (q.invited_supplier?.supplier?.company_name || '—') + '</p></td>' +
+                        '<td class="px-4 py-3 text-right"><p class="font-bold text-sm ' + (isLowest ? 'text-green-600' : 'text-gray-800') + '">' + fmtRp(q.total_price) + '</p>' + (isLowest ? '<p class="text-green-500 text-xs">Terendah ✓</p>' : '') + '</td>' +
+                        '<td class="px-4 py-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (quotCls[q.status] || '') + '">' + q.status + '</span></td>' +
+                        '<td class="px-4 py-3 text-right">' + actions + '</td></tr>';
+                }).join('') + '</tbody></table></div>';
+            showModal('compareModal');
+        } catch (e) {
+            toast('Gagal: ' + e.message, 'error');
         }
+    }
 
-        Promise.all([loadBatch(), loadMasterData()]);
-    </script>
+    // ─── Approve / Reject ─────────────────────────────────────────────────
+    async function doApprove(id) {
+        if (!confirm('Setujui penawaran ini? PO akan digenerate otomatis.')) return;
+        const res  = await fetch('/api/admin/quotations/' + id + '/approve', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+            body: JSON.stringify({ note: '' })
+        });
+        const json = await res.json();
+        if (res.ok && json.success) { toast('Approved! PO digenerate.'); await loadBatch(); }
+        else toast(json.message || 'Gagal', 'error');
+    }
+
+    async function doReject(id) {
+        const note = prompt('Alasan penolakan (wajib):');
+        if (!note) return;
+        const res  = await fetch('/api/admin/quotations/' + id + '/reject', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+            body: JSON.stringify({ note })
+        });
+        const json = await res.json();
+        if (res.ok && json.success) { toast('Penawaran ditolak.'); await loadBatch(); }
+        else toast(json.message || 'Gagal', 'error');
+    }
+
+    async function sendReminder() {
+        if (!confirm('Kirim email reminder ke supplier pemenang di batch ini?')) return;
+        const res  = await fetch('/api/admin/batches/' + batchId + '/send-reminder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+            body: JSON.stringify({})
+        });
+        const json = await res.json();
+        if (res.ok && json.success) toast('Reminder terkirim!');
+        else toast(json.message || 'Gagal', 'error');
+    }
+
+    function setAlert(id, msg) {
+        const el = document.getElementById(id);
+        el.textContent = msg;
+        el.classList.remove('hidden');
+    }
+
+    function toast(msg, type = 'success') {
+        const t = document.createElement('div');
+        t.className = `fixed bottom-5 right-5 px-5 py-3 rounded-xl text-white text-sm z-[9999] shadow-lg ${
+            type === 'success' ? 'bg-green-600' : 'bg-red-600'
+        }`;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+    }
+
+    // Blokir input manual tanggal lampau via event listener
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('editDeadline').addEventListener('change', function () {
+            if (this.value && this.value < getTodayStr()) {
+                this.value = '';
+                setAlert('alertEdit', 'Tanggal deadline tidak boleh tanggal yang sudah lewat.');
+            }
+        });
+    });
+
+    Promise.all([loadBatch(), loadMasterData()]);
+</script>
 @endpush

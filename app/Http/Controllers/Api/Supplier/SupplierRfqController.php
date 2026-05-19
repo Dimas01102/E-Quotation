@@ -51,8 +51,12 @@ class SupplierRfqController extends Controller
                 ->where('status', 'approved')
                 ->isNotEmpty();
 
+            // Deadline masih valid selama belum lewat akhir hari (timezone Jakarta)
             $deadlineIsFuture = $batch?->deadline
-                && Carbon::parse($batch->deadline)->isFuture();
+                && Carbon::parse($batch->deadline)
+                ->timezone('Asia/Jakarta')
+                ->endOfDay()
+                ->isFuture();
 
             /*
              * can_submit = true jika:
@@ -78,8 +82,8 @@ class SupplierRfqController extends Controller
                 'invited_at'          => $inv->invited_at,
                 'can_submit'          => $canSubmit,
                 'has_submitted'       => $hasActivePendingQuotation,
-                'is_winner'           => $isWinner,        // ← baru: flag pemenang untuk frontend
-                'deadline_passed'     => !$deadlineIsFuture, // ← baru: flag deadline untuk frontend
+                'is_winner'           => $isWinner,        // baru: flag pemenang untuk frontend
+                'deadline_passed'     => !$deadlineIsFuture, // baru: flag deadline untuk frontend
                 'batch' => [
                     'id_batch'     => $batch?->id_batch,
                     'batch_number' => $batch?->batch_number,

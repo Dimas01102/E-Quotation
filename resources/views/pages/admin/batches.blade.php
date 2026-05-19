@@ -145,6 +145,15 @@
             closed: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
         };
 
+        // Timezone-safe: pakai waktu lokal browser, bukan UTC
+        function getTodayStr() {
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
         function showModal(id) {
             const el = document.getElementById(id);
             el.style.removeProperty('display');
@@ -163,7 +172,11 @@
             if (!val) return '—';
             const d = new Date(val);
             if (isNaN(d)) return val;
-            return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+            return d.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
         }
 
         function fmtRp(val) {
@@ -209,37 +222,37 @@
                 return;
             }
             tb.innerHTML = list.map((b, i) => `
-        <tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
-            <td class="px-5 py-3.5 text-xs text-gray-400">${i+1}</td>
-            <td class="px-5 py-3.5">
-                <a href="/admin/batches/${b.id_batch}" class="font-mono text-sm font-bold text-blue-600 hover:underline">${b.batch_number}</a>
-            </td>
-            <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-white text-sm">${b.title}</td>
-            <td class="px-5 py-3.5 text-sm ${b.deadline && new Date(b.deadline) < new Date() ? 'text-red-500 font-medium' : 'text-gray-500'}">${fmtDate(b.deadline)}</td>
-            <td class="px-5 py-3.5">
-                <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusCls[b.status] || 'bg-gray-100 text-gray-600'}">${b.status}</span>
-            </td>
-            <td class="px-5 py-3.5 text-xs text-gray-500">${fmtDate(b.created_at)}</td>
-            <td class="px-5 py-3.5 text-right">
-                <div class="flex items-center justify-end gap-2">
-                    <a href="/admin/batches/${b.id_batch}"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 text-blue-600 rounded-lg text-xs font-medium transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        Detail
-                    </a>
-                    <button onclick="openEdit(${b.id_batch})"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 text-amber-600 rounded-lg text-xs font-medium transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                        Edit
-                    </button>
-                    <button onclick="askDel(${b.id_batch})"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 rounded-lg text-xs font-medium transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        Hapus
-                    </button>
-                </div>
-            </td>
-        </tr>`).join('');
+    <tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
+        <td class="px-5 py-3.5 text-xs text-gray-400">${i+1}</td>
+        <td class="px-5 py-3.5">
+            <a href="/admin/batches/${b.id_batch}" class="font-mono text-sm font-bold text-blue-600 hover:underline">${b.batch_number}</a>
+        </td>
+        <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-white text-sm">${b.title}</td>
+        <td class="px-5 py-3.5 text-sm ${b.deadline && new Date(b.deadline) < new Date() ? 'text-red-500 font-medium' : 'text-gray-500'}">${fmtDate(b.deadline)}</td>
+        <td class="px-5 py-3.5">
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusCls[b.status] || 'bg-gray-100 text-gray-600'}">${b.status}</span>
+        </td>
+        <td class="px-5 py-3.5 text-xs text-gray-500">${fmtDate(b.created_at)}</td>
+        <td class="px-5 py-3.5 text-right">
+            <div class="flex items-center justify-end gap-2">
+                <a href="/admin/batches/${b.id_batch}"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 text-blue-600 rounded-lg text-xs font-medium transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    Detail
+                </a>
+                <button onclick="openEdit(${b.id_batch})"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 text-amber-600 rounded-lg text-xs font-medium transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    Edit
+                </button>
+                <button onclick="askDel(${b.id_batch})"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 rounded-lg text-xs font-medium transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Hapus
+                </button>
+            </div>
+        </td>
+    </tr>`).join('');
         }
 
         function openAddBatch() {
@@ -247,7 +260,7 @@
             document.getElementById('batchTitle').value = '';
             document.getElementById('batchDesc').value = '';
             document.getElementById('batchDeadline').value = '';
-            document.getElementById('batchDeadline').min = new Date().toISOString().split('T')[0];
+            document.getElementById('batchDeadline').min = getTodayStr();
             document.getElementById('statusRow').classList.add('hidden');
             document.getElementById('modalBatchTitle').textContent = 'Buat Batch RFQ';
             document.getElementById('alertBatch').classList.add('hidden');
@@ -261,7 +274,7 @@
             document.getElementById('batchTitle').value = b.title;
             document.getElementById('batchDesc').value = b.description || '';
             document.getElementById('batchDeadline').value = b.deadline ? b.deadline.toString().substring(0, 10) : '';
-            document.getElementById('batchDeadline').min = new Date().toISOString().split('T')[0];
+            document.getElementById('batchDeadline').min = getTodayStr();
             document.getElementById('batchStatus').value = b.status;
             document.getElementById('statusRow').classList.remove('hidden');
             document.getElementById('modalBatchTitle').textContent = 'Edit Batch';
@@ -277,6 +290,12 @@
 
             if (!title || !deadline) {
                 showAlertBatch('Judul dan deadline wajib.');
+                return;
+            }
+
+            // Validasi client-side timezone-safe
+            if (deadline < getTodayStr()) {
+                showAlertBatch('Deadline tidak boleh tanggal yang sudah lewat.');
                 return;
             }
 
@@ -302,7 +321,10 @@
                 });
                 const json = await res.json();
                 if (!res.ok || !json.success) {
-                    showAlertBatch(json.message || 'Gagal.');
+                    const errMsg = json.errors ?
+                        Object.values(json.errors).flat().join(' ') :
+                        (json.message || 'Gagal.');
+                    showAlertBatch(errMsg);
                     return;
                 }
                 closeModalBatch();
@@ -347,12 +369,22 @@
         function toast(msg, type = 'success') {
             const t = document.createElement('div');
             t.className = `fixed bottom-5 right-5 px-5 py-3 rounded-xl text-white text-sm z-[9999] shadow-lg ${
-        type === 'success' ? 'bg-green-600' : 'bg-red-600'
-    }`;
+            type === 'success' ? 'bg-green-600' : 'bg-red-600'
+        }`;
             t.textContent = msg;
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
+
+        // Blokir input manual tanggal lampau via event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('batchDeadline').addEventListener('change', function() {
+                if (this.value && this.value < getTodayStr()) {
+                    this.value = '';
+                    showAlertBatch('Tanggal deadline tidak boleh tanggal yang sudah lewat.');
+                }
+            });
+        });
 
         loadBatches();
     </script>

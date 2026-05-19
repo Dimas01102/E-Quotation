@@ -22,7 +22,9 @@ class Batch extends Model
         // karena template pindah ke tabel rfq_templates (master data)
     ];
 
-    protected $casts = ['deadline' => 'date'];
+    protected $casts = [
+    'deadline' => 'date:Y-m-d',
+    ];
 
     public function creator()
     {

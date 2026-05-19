@@ -36,7 +36,9 @@ class BatchController extends Controller
         ])->findOrFail($id);
 
         $quotations = Quotation::with(['invitedSupplier.supplier.user'])
-            ->whereHas('invitedSupplier', fn($q) =>
+            ->whereHas(
+                'invitedSupplier',
+                fn($q) =>
                 $q->whereHas('batchCategory', fn($q2) => $q2->where('id_batch', $id))
             )->get();
 
@@ -59,7 +61,7 @@ class BatchController extends Controller
         $request->validate([
             'title'       => 'required|string|max:255',
             'description' => 'nullable|string',
-            'deadline'    => 'required|date|after_or_equal:today',
+            'deadline' => 'required|date_format:Y-m-d|after_or_equal:' . now('Asia/Jakarta')->format('Y-m-d'),
         ]);
 
         $count  = Batch::whereDate('created_at', today())->count() + 1;
@@ -84,7 +86,7 @@ class BatchController extends Controller
         $request->validate([
             'title'       => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
-            'deadline'    => 'sometimes|required|date|after_or_equal:today',
+            'deadline' => 'required|date_format:Y-m-d|after_or_equal:' . now('Asia/Jakarta')->format('Y-m-d'),
             'status'      => 'sometimes|required|in:draft,open,closed',
         ]);
 
@@ -96,23 +98,23 @@ class BatchController extends Controller
         $newDeadline     = $request->deadline;
         $deadlineChanged = $newDeadline && $newDeadline !== $oldDeadline;
 
-        // ── Re-open: batch yang tadinya closed/awarded kembali ke open/draft ──
         $reopened = $request->has('status')
             && in_array($request->status, ['open', 'draft'])
             && in_array($oldStatus, ['closed', 'awarded']);
 
         if ($reopened) {
-            // Hanya pemenang (approved) yang batch-nya kembali open
-            // Supplier rejected TETAP closed — tidak perlu diubah
             $this->reopenForWinnersOnly($batch->fresh());
         }
 
-        // Kirim notif jika di-reopen atau deadline diubah
         if ($reopened || $deadlineChanged) {
             $this->notifyWinnersOnReopen($batch->fresh(), $deadlineChanged ? $newDeadline : null);
         }
 
-        return response()->json(['success' => true, 'message' => 'Batch berhasil diperbarui.', 'batch' => $batch->fresh()]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Batch berhasil diperbarui.',
+            'batch'   => $batch->fresh(),
+        ]);
     }
 
     public function destroy($id)
@@ -190,7 +192,8 @@ class BatchController extends Controller
         }
 
         if (InvitedSupplierCategory::where('id_supplier', $request->id_supplier)
-            ->where('id_batch_category', $request->id_batch_category)->exists()) {
+            ->where('id_batch_category', $request->id_batch_category)->exists()
+        ) {
             return response()->json(['success' => false, 'message' => 'Supplier sudah diundang.'], 422);
         }
 
@@ -228,11 +231,13 @@ class BatchController extends Controller
             'invitedSupplier.supplier.user',
             'invitedSupplier.batchCategory.masterCategory',
         ])
-        ->whereHas('invitedSupplier', fn($q) =>
-            $q->whereHas('batchCategory', fn($q2) => $q2->where('id_batch', $id))
-        )
-        ->orderBy('total_price')
-        ->get();
+            ->whereHas(
+                'invitedSupplier',
+                fn($q) =>
+                $q->whereHas('batchCategory', fn($q2) => $q2->where('id_batch', $id))
+            )
+            ->orderBy('total_price')
+            ->get();
 
         return response()->json(['success' => true, 'batch' => $batch, 'quotations' => $quotations]);
     }
@@ -248,7 +253,9 @@ class BatchController extends Controller
 
         $approvedQuotations = Quotation::with(['invitedSupplier.supplier.user'])
             ->where('status', 'approved')
-            ->whereHas('invitedSupplier', fn($q) =>
+            ->whereHas(
+                'invitedSupplier',
+                fn($q) =>
                 $q->whereHas('batchCategory', fn($q2) => $q2->where('id_batch', $id))
             )
             ->get();
@@ -269,15 +276,15 @@ class BatchController extends Controller
 
     /**
      * Saat batch di-reopen:
-     * - Pemenang (approved) → status invitation kembali ke 'invited' supaya bisa submit ulang
-     * - Rejected → TIDAK diubah, tetap closed/rejected
+     * - Pemenang (approved) -> status invitation kembali ke 'invited' supaya bisa submit ulang
+     * - Rejected -> TIDAK diubah, tetap closed/rejected
      */
     private function reopenForWinnersOnly(Batch $batch): void
     {
         // Ambil semua invitation yang pemenangnya approved di batch ini
         $winnerInvitations = InvitedSupplierCategory::whereHas('batchCategory', function ($q) use ($batch) {
-                $q->where('id_batch', $batch->id_batch);
-            })
+            $q->where('id_batch', $batch->id_batch);
+        })
             ->whereHas('quotations', function ($q) {
                 // Hanya supplier yang memiliki quotation approved (pemenang)
                 $q->where('status', 'approved');
@@ -300,7 +307,9 @@ class BatchController extends Controller
     {
         $approved = Quotation::with(['invitedSupplier.supplier.user'])
             ->where('status', 'approved')
-            ->whereHas('invitedSupplier', fn($q) =>
+            ->whereHas(
+                'invitedSupplier',
+                fn($q) =>
                 $q->whereHas('batchCategory', fn($q2) => $q2->where('id_batch', $batch->id_batch))
             )
             ->get();

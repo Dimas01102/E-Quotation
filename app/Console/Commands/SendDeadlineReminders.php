@@ -7,6 +7,7 @@ use App\Models\InvitedSupplierCategory;
 use App\Models\Quotation;
 use App\Services\MailService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class SendDeadlineReminders extends Command
@@ -20,13 +21,12 @@ class SendDeadlineReminders extends Command
 
         $mail = new MailService();
 
-        // Cari batch open yang deadlinenya H-3 atau H-1
         $batches = Batch::where('status', 'open')
             ->whereNotNull('deadline')
-            ->whereIn(\Illuminate\Support\Facades\DB::raw('DATE(deadline)'), [
-                today()->addDays(3)->format('Y-m-d'),
-                today()->addDays(1)->format('Y-m-d'),
-            ])
+            ->where(function ($q) {
+                $q->whereDate('deadline', today('Asia/Jakarta')->addDays(3))
+                    ->orWhereDate('deadline', today('Asia/Jakarta')->addDays(1));
+            })
             ->get();
 
         if ($batches->isEmpty()) {
@@ -35,7 +35,8 @@ class SendDeadlineReminders extends Command
         }
 
         foreach ($batches as $batch) {
-            $daysLeft = today()->diffInDays($batch->deadline);
+            $daysLeft = today('Asia/Jakarta')->diffInDays($batch->deadline);
+
             $this->line("Batch: {$batch->batch_number} | H-{$daysLeft}");
 
             $invitations = InvitedSupplierCategory::with('supplier.user')
@@ -47,12 +48,31 @@ class SendDeadlineReminders extends Command
                 $supplier = $inv->supplier;
                 if (!$user || !$supplier) continue;
 
-                // Skip jika sudah submit
-                if (Quotation::where('id_invited_supplier', $inv->id_invited_supplier)->exists()) {
-                    $this->line("  → {$user->email} sudah submit, skip.");
+                $invitedIds = InvitedSupplierCategory::whereHas(
+                    'batchCategory',
+                    fn($q) => $q->where('id_batch', $batch->id_batch)
+                )
+                    ->where('id_supplier', $supplier->id)
+                    ->pluck('id_invited_supplier');
+
+                $latestQuotation = Quotation::whereIn('id_invited_supplier', $invitedIds)
+                    ->latest('submitted_at')
+                    ->first();
+
+                // Kalah (rejected) = skip
+                if ($latestQuotation?->status === 'rejected') {
+                    $this->line("  → {$user->email} rejected (kalah), skip.");
                     continue;
                 }
 
+                // Sudah submit tapi belum diproses = skip
+                if (in_array($latestQuotation?->status, ['pending', 'submitted'])) {
+                    $this->line("  → {$user->email} sudah submit ({$latestQuotation->status}), skip.");
+                    continue;
+                }
+
+                // Approved (pemenang) dan belum submit = dapat reminder
+                // NULL (belum pernah submit) = dapat reminder
                 try {
                     $mail->sendDeadlineReminder(
                         $user->email,

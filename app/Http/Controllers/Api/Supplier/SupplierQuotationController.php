@@ -87,7 +87,7 @@ class SupplierQuotationController extends Controller
         }
 
         // Cek deadline
-        if ($batch->deadline && Carbon::parse($batch->deadline)->isPast()) {
+        if ($batch->deadline && Carbon::parse($batch->deadline)->timezone('Asia/Jakarta')->endOfDay()->isPast()) {
             return response()->json([
                 'success' => false,
                 'message' => 'Deadline pengadaan ini sudah lewat. Tidak bisa mengajukan penawaran.',
