@@ -85,6 +85,7 @@
                             <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500">Nama / Perusahaan</th>
                             <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500">Email</th>
                             <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500">Telepon</th>
+                            <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500">Bidang Usaha</th>
                             <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500">Status</th>
                             <th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500">Tgl Daftar</th>
                             <th class="text-right px-5 py-3.5 text-xs font-semibold text-gray-500">Aksi</th>
@@ -156,46 +157,53 @@
             const tbody = document.getElementById('supplierTable');
             if (!list.length) {
                 tbody.innerHTML =
-                    '<tr><td colspan="7" class="px-5 py-6 text-center text-sm text-gray-400">Tidak ada data supplier.</td></tr>';
+                    '<tr><td colspan="8" class="px-5 py-6 text-center text-sm text-gray-400">Tidak ada data supplier.</td></tr>';
                 return;
             }
             tbody.innerHTML = list.map((s, i) => {
                 const isActive = Number(s.user?.is_active) === 1;
+                const bf = s.business_field || '-';
                 return `
-        <tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
-            <td class="px-5 py-3.5 text-xs text-gray-400">${i+1}</td>
-            <td class="px-5 py-3.5">
-                <p class="font-medium text-gray-800 dark:text-white text-sm">${s.user?.name || '-'}</p>
-                <p class="text-xs text-gray-500 mt-0.5">${s.company_name || '-'}</p>
-            </td>
-            <td class="px-5 py-3.5 text-sm text-gray-600 dark:text-gray-400">${s.user?.email || '-'}</td>
-            <td class="px-5 py-3.5 text-sm text-gray-600 dark:text-gray-400">${s.phone || '-'}</td>
-            <td class="px-5 py-3.5">
-                <span class="px-2.5 py-1 rounded-full text-xs font-medium ${isActive
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}">
-                    ${isActive ? 'Aktif' : 'Menunggu'}
-                </span>
-            </td>
-            <td class="px-5 py-3.5 text-xs text-gray-500">${s.created_at ? new Date(s.created_at).toLocaleDateString('id-ID') : '-'}</td>
-            <td class="px-5 py-3.5 text-right">
-                <div class="flex items-center justify-end gap-2">
-                    <button onclick="showDetail(${s.id})"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-medium transition-colors">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        Detail
-                    </button>
-                    <button onclick="quickToggle(${s.id}, ${Number(s.user?.is_active)})"
-                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${isActive
-                            ? 'bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400'
-                            : 'bg-green-50 hover:bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400'}">
-                        ${isActive
-                            ? `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>Nonaktifkan`
-                            : `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Aktifkan`}
-                    </button>
-                </div>
-            </td>
-        </tr>`;
+<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
+    <td class="px-5 py-3.5 text-xs text-gray-400">${i+1}</td>
+    <td class="px-5 py-3.5">
+        <p class="font-medium text-gray-800 dark:text-white text-sm">${s.user?.name || '-'}</p>
+        <p class="text-xs text-gray-500 mt-0.5">${s.company_name || '-'}</p>
+    </td>
+    <td class="px-5 py-3.5 text-sm text-gray-600 dark:text-gray-400">${s.user?.email || '-'}</td>
+    <td class="px-5 py-3.5 text-sm text-gray-600 dark:text-gray-400">${s.phone || '-'}</td>
+    <td class="px-5 py-3.5">                                        
+        ${bf !== '-'
+            ? `<span class="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs">${bf}</span>`
+            : `<span class="text-xs text-gray-400">-</span>`
+        }
+    </td>
+    <td class="px-5 py-3.5">
+        <span class="px-2.5 py-1 rounded-full text-xs font-medium ${isActive
+            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+            : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'}">
+            ${isActive ? 'Aktif' : 'Menunggu'}
+        </span>
+    </td>
+    <td class="px-5 py-3.5 text-xs text-gray-500">${s.created_at ? new Date(s.created_at).toLocaleDateString('id-ID') : '-'}</td>
+    <td class="px-5 py-3.5 text-right">
+        <div class="flex items-center justify-end gap-2">
+            <button onclick="showDetail(${s.id})"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-medium transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Detail
+            </button>
+            <button onclick="quickToggle(${s.id}, ${Number(s.user?.is_active)})"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${isActive
+                    ? 'bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400'
+                    : 'bg-green-50 hover:bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400'}">
+                ${isActive
+                    ? `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>Nonaktifkan`
+                    : `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Aktifkan`}
+            </button>
+        </div>
+    </td>
+</tr>`;
             }).join('');
         }
 
@@ -229,6 +237,7 @@
         <div><p class="text-xs text-gray-400 mb-1">Nama PIC</p><p class="font-medium text-gray-800 dark:text-white">${s.user?.name || '-'}</p></div>
         <div><p class="text-xs text-gray-400 mb-1">Email</p><p class="text-gray-700 dark:text-gray-300">${s.user?.email || '-'}</p></div>
         <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Nama Perusahaan</p><p class="font-semibold text-gray-800 dark:text-white">${s.company_name || '-'}</p></div>
+        <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Bidang Usaha</p>${s.business_field? `<span class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-medium">${s.business_field}</span>`: `<p class="text-gray-400 text-sm">-</p>`}</div>
         <div><p class="text-xs text-gray-400 mb-1">Telepon</p><p class="text-gray-700 dark:text-gray-300">${s.phone || '-'}</p></div>
         <div><p class="text-xs text-gray-400 mb-1">NPWP</p><p class="text-gray-700 dark:text-gray-300">${s.npwp || '-'}</p></div>
         <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Alamat</p><p class="text-gray-700 dark:text-gray-300">${s.address || '-'}</p></div>

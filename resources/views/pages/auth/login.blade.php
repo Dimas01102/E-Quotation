@@ -7,21 +7,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login - E-Quotation System</title>
     <link rel="icon" type="image/png" href="/assets/images/logo.jpg">
-    
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
-    
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
-    <script>
-        (function() {
-            const t = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ?
-                'dark' : 'light');
-            if (t === 'dark') document.documentElement.classList.add('dark');
-        })()
-    </script>
-    
+
     <style>
         * { box-sizing: border-box; }
 
@@ -170,6 +162,7 @@
         .form-title { font-size: 22px; font-weight: 700; color: #111827; margin: 0 0 5px; letter-spacing: -0.3px; }
         .form-subtitle { font-size: 13px; color: #6b7280; margin: 0 0 2rem; }
 
+        /* Banner error umum (akun nonaktif, jaringan, dll) */
         #error-alert {
             display: none;
             margin-bottom: 1.25rem;
@@ -217,9 +210,33 @@
             box-shadow: 0 0 0 3px rgba(22,53,42,0.1);
         }
 
+        /* State error pada input */
+        .field-input.input-error {
+            border-color: #ef4444;
+            background: #fff5f5;
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
+        }
+        .field-input.input-error:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+        }
+
+        /* Teks error di bawah field */
+        .field-error-text {
+            font-size: 12px;
+            color: #ef4444;
+            display: none;
+            align-items: center;
+            gap: 5px;
+        }
+        .field-error-text.visible {
+            display: flex;
+        }
+        .field-error-text i { font-size: 11px; }
+
         .pw-wrapper { position: relative; }
         .pw-wrapper .field-input { padding-right: 44px; }
-        
+
         .pw-toggle {
             position: absolute;
             right: 14px;
@@ -233,15 +250,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px; /* Font Awesome size */
+            font-size: 16px;
         }
         .pw-toggle:hover { color: #16352a; }
-
-        .remember-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
 
         #login-btn {
             width: 100%;
@@ -270,14 +281,8 @@
         }
         .register-hint a { color: #16352a; font-weight: 700; text-decoration: none; }
 
-        /* Spinner for loading */
-        .animate-spin {
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .hidden { display: none; }
 
         @media (max-width: 640px) {
@@ -319,26 +324,38 @@
         <h2 class="form-title">Masuk ke Akun</h2>
         <p class="form-subtitle">Masukkan email dan password untuk login ke sistem.</p>
 
+        {{-- Banner untuk error umum (akun nonaktif, jaringan) --}}
         <div id="error-alert">
             <svg viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span id="error-msg"></span>
         </div>
 
         <div class="form-stack">
+
+            {{-- Field Email --}}
             <div class="field-group">
                 <label class="field-label" for="login-email">Email <span>*</span></label>
                 <input type="email" id="login-email" placeholder="Masukkan Email" class="field-input">
+                <span class="field-error-text" id="error-email">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span id="error-email-msg"></span>
+                </span>
             </div>
 
+            {{-- Field Password --}}
             <div class="field-group">
                 <label class="field-label" for="login-password">Password <span>*</span></label>
                 <div class="pw-wrapper">
-                    <input type="password" id="login-password" placeholder="Masukkan password" class="field-input" onkeydown="if(event.key==='Enter')doLogin()">
-                    
+                    <input type="password" id="login-password" placeholder="Masukkan password"
+                           class="field-input" onkeydown="if(event.key==='Enter')doLogin()">
                     <button type="button" class="pw-toggle" onclick="togglePassword()">
                         <i id="toggle-icon" class="fas fa-eye"></i>
                     </button>
                 </div>
+                <span class="field-error-text" id="error-password">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span id="error-password-msg"></span>
+                </span>
             </div>
 
             <button id="login-btn" onclick="doLogin()">
@@ -356,47 +373,59 @@
 <script>
     let isLoading = false;
 
-    // Fungsi Toggle Password menggunakan Vanilla JS & Font Awesome
     function togglePassword() {
-        const passwordInput = document.getElementById('login-password');
-        const icon = document.getElementById('toggle-icon');
-
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
+        const input = document.getElementById('login-password');
+        const icon  = document.getElementById('toggle-icon');
+        const isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        icon.classList.toggle('fa-eye',      !isHidden);
+        icon.classList.toggle('fa-eye-slash', isHidden);
     }
 
     async function doLogin() {
         if (isLoading) return;
 
-        const email = document.getElementById('login-email').value.trim();
+        const email    = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value;
 
-        if (!email || !password) {
-            showError('Email dan password wajib diisi.');
-            return;
+        clearFieldErrors();
+        hideError();
+
+        // ── Validasi sisi klien ──────────────────────────────
+        let hasError = false;
+
+        if (!email) {
+            setFieldError('email', 'Email wajib diisi.');
+            hasError = true;
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setFieldError('email', 'Format email tidak valid.');
+            hasError = true;
         }
 
+        if (!password) {
+            setFieldError('password', 'Password wajib diisi.');
+            hasError = true;
+        } else if (password.length < 6) {
+            setFieldError('password', 'Password minimal 6 karakter.');
+            hasError = true;
+        }
+
+        if (hasError) return;
+
+        // ── Kirim request ────────────────────────────────────
         setLoading(true);
-        hideError();
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            
+
             const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json'
+                    'Content-Type':  'application/json',
+                    'X-CSRF-TOKEN':  csrfToken,
+                    'Accept':        'application/json',
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password }),
             });
 
             const r = await res.json();
@@ -409,30 +438,62 @@
                     timer: 1500,
                     timerProgressBar: true,
                     showConfirmButton: false,
-                    didOpen: () => {
-                        Swal.getPopup().style.borderRadius = '16px';
-                    },
+                    didOpen: () => Swal.getPopup().style.borderRadius = '16px',
                 });
                 window.location.href = r.redirect;
             } else {
-                showError(r.message || 'Login gagal.');
+                // Tampilkan error spesifik di field yang bersangkutan
+                if (r.field === 'email') {
+                    setFieldError('email', r.message);
+                } else if (r.field === 'password') {
+                    setFieldError('password', r.message);
+                } else {
+                    // Error umum akun belum aktif, dll = tampilkan di banner
+                    showError(r.message || 'Login gagal. Silakan coba lagi.');
+                }
                 setLoading(false);
             }
+
         } catch (e) {
-            showError('Terjadi kesalahan jaringan atau konfigurasi.');
+            showError('Terjadi kesalahan jaringan. Periksa koneksi Anda dan coba lagi.');
             setLoading(false);
         }
     }
 
+    // ── Helpers ──────────────────────────────────────────────
+
+    function setFieldError(field, msg) {
+        const input   = document.getElementById(`login-${field}`);
+        const wrapper = document.getElementById(`error-${field}`);
+        const msgEl   = document.getElementById(`error-${field}-msg`);
+
+        if (input)   input.classList.add('input-error');
+        if (wrapper) wrapper.classList.add('visible');
+        if (msgEl)   msgEl.textContent = msg;
+
+        // Hapus error otomatis saat user mulai mengetik ulang
+        input?.addEventListener('input', () => clearFieldError(field), { once: true });
+    }
+
+    function clearFieldError(field) {
+        const input   = document.getElementById(`login-${field}`);
+        const wrapper = document.getElementById(`error-${field}`);
+        const msgEl   = document.getElementById(`error-${field}-msg`);
+
+        if (input)   input.classList.remove('input-error');
+        if (wrapper) wrapper.classList.remove('visible');
+        if (msgEl)   msgEl.textContent = '';
+    }
+
+    function clearFieldErrors() {
+        ['email', 'password'].forEach(clearFieldError);
+    }
+
     function setLoading(v) {
         isLoading = v;
-        const btn = document.getElementById('login-btn');
-        const spinner = document.getElementById('login-spinner');
-        const btnText = document.getElementById('login-text');
-
-        btn.disabled = v;
-        spinner.classList.toggle('hidden', !v);
-        btnText.textContent = v ? 'Memproses...' : 'Masuk';
+        document.getElementById('login-btn').disabled     = v;
+        document.getElementById('login-spinner').classList.toggle('hidden', !v);
+        document.getElementById('login-text').textContent = v ? 'Memproses...' : 'Masuk';
     }
 
     function showError(msg) {

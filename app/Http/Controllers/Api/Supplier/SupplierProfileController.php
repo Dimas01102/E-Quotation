@@ -17,9 +17,9 @@ class SupplierProfileController extends Controller
         $supplier = Supplier::where('user_id', $user->id)->firstOrFail();
 
         return response()->json([
-            'success'   => true,
-            'supplier'  => $supplier,
-            'user'      => [
+            'success'  => true,
+            'supplier' => $supplier,  
+            'user'     => [
                 'id'        => $user->id,
                 'name'      => $user->name,
                 'email'     => $user->email,
@@ -36,11 +36,12 @@ class SupplierProfileController extends Controller
         $supplier = Supplier::where('user_id', $user->id)->firstOrFail();
 
         $rules = [
-            'name'         => 'required|string|max:255',
-            'company_name' => 'required|string|max:255',
-            'phone'        => 'required|string|max:20',
-            'npwp'         => 'nullable|string|max:30',
-            'address'      => 'nullable|string',
+            'name'           => 'required|string|max:255',
+            'company_name'   => 'required|string|max:255',
+            'phone'          => 'required|string|max:20',
+            'npwp'           => 'nullable|string|max:30',
+            'address'        => 'nullable|string',
+            'business_field' => 'nullable|string|max:150', 
         ];
 
         if ($request->filled('password')) {
@@ -49,32 +50,29 @@ class SupplierProfileController extends Controller
 
         $request->validate($rules);
 
-        // Update nama user
+        // Update nama (dan password jika diisi)
         $userUpdate = ['name' => $request->name];
-
         if ($request->filled('password')) {
             $userUpdate['password'] = Hash::make($request->password);
         }
-
         User::where('id', $user->id)->update($userUpdate);
 
-        // Update supplier data
         $supplier->update([
-            'company_name' => $request->company_name,
-            'phone'        => $request->phone,
-            'npwp'         => $request->npwp,
-            'address'      => $request->address,
+            'company_name'   => $request->company_name,
+            'phone'          => $request->phone,
+            'npwp'           => $request->npwp,
+            'address'        => $request->address,
+            'business_field' => $request->business_field, 
         ]);
 
-        // Re-fetch data terbaru
         $freshUser     = User::find($user->id);
         $freshSupplier = $supplier->fresh();
 
         return response()->json([
-            'success'   => true,
-            'message'   => 'Profil berhasil diperbarui.',
-            'supplier'  => $freshSupplier,
-            'user'      => [
+            'success'  => true,
+            'message'  => 'Profil berhasil diperbarui.',
+            'supplier' => $freshSupplier,
+            'user'     => [
                 'id'        => $freshUser->id,
                 'name'      => $freshUser->name,
                 'email'     => $freshUser->email,

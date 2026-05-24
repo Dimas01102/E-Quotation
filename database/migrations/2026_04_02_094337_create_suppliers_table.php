@@ -15,6 +15,8 @@ return new class extends Migration
             $table->string('phone', 50)->nullable();
             $table->text('address')->nullable();
             $table->string('npwp', 50)->nullable();
+            $table->string('business_field', 150)->nullable()->after('npwp')
+                  ->comment('Bidang usaha perusahaan supplier');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
 

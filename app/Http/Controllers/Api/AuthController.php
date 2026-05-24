@@ -24,19 +24,43 @@ class AuthController extends Controller
         ]);
 
         if ($v->fails()) {
-            return response()->json(['success' => false, 'errors' => $v->errors()], 422);
+            $errors  = $v->errors();
+            $field   = $errors->has('email') ? 'email' : 'password';
+            $message = $errors->first($field);
+
+            return response()->json([
+                'success' => false,
+                'field'   => $field,
+                'message' => $message,
+            ], 422);
         }
 
+        // Cek apakah email terdaftar
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json(['success' => false, 'message' => 'Email atau password salah.'], 401);
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'field'   => 'email',
+                'message' => 'Email tidak terdaftar di sistem.',
+            ], 401);
         }
 
+        // Cek password
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'field'   => 'password',
+                'message' => 'Password yang Anda masukkan salah.',
+            ], 401);
+        }
+
+        // Cek status aktif akun
         if (!$user->is_active) {
             return response()->json([
                 'success' => false,
-                'message' => 'Akun Anda belum aktif. Tunggu konfirmasi admin.',
+                'field'   => null,
+                'message' => 'Akun Anda belum aktif. Silakan tunggu konfirmasi dari admin.',
             ], 403);
         }
 
@@ -59,7 +83,6 @@ class AuthController extends Controller
             'name'         => 'required|string|max:100',
             'email'        => 'required|email|max:100|unique:users,email',
             'password'     => 'required|string|min:8|confirmed',
-            // Kolom suppliers: company_name, phone, address, npwp
             'company_name' => 'required|string|max:150',
             'phone'        => 'required|string|max:50',
             'address'      => 'nullable|string',
@@ -74,18 +97,16 @@ class AuthController extends Controller
         }
 
         try {
-            // users.is_active = false → pending verifikasi admin
             $user = new User();
-            $user->name      = $request->name;
-            $user->email     = $request->email;
-            $user->password  = Hash::make($request->password);
-            $user->role      = 'supplier';
-            $user->is_active = false;
+            $user->name       = $request->name;
+            $user->email      = $request->email;
+            $user->password   = Hash::make($request->password);
+            $user->role       = 'supplier';
+            $user->is_active  = false;
             $user->created_at = now();
             $user->updated_at = now();
             $user->save();
 
-            // suppliers
             $supplier = new Supplier();
             $supplier->user_id      = $user->id;
             $supplier->company_name = $request->company_name;

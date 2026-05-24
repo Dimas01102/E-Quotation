@@ -38,6 +38,9 @@
                 <p id="sideCompany" class="font-medium text-gray-800 dark:text-white text-sm">—</p>
                 <p id="sideName" class="text-gray-500 text-xs mt-0.5">—</p>
                 <p id="sideEmail" class="text-gray-400 text-xs mt-0.5">—</p>
+
+                {{--  Badge bidang usaha --}}
+                <p id="sideBusinessField" class="hidden mt-2 px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-medium"></p>
                 <div id="sideStatus" class="mt-3"></div>
             </div>
 
@@ -79,6 +82,12 @@
                         <p class="text-xs text-gray-400 mb-1">Nama Perusahaan</p>
                         <p id="vCompany" class="font-medium text-gray-800 dark:text-white">—</p>
                     </div>
+
+                    <div class="col-span-2">
+                        <p class="text-xs text-gray-400 mb-1">Bidang Usaha</p>
+                        <p id="vBusinessField" class="text-gray-700 dark:text-gray-300">—</p>
+                    </div>
+
                     <div>
                         <p class="text-xs text-gray-400 mb-1">Telepon</p>
                         <p id="vPhone" class="text-gray-700 dark:text-gray-300">—</p>
@@ -91,6 +100,15 @@
                         <p class="text-xs text-gray-400 mb-1">Alamat</p>
                         <p id="vAddress" class="text-gray-700 dark:text-gray-300 leading-relaxed">—</p>
                     </div>
+                </div>
+
+                {{-- Info jika bidang usaha belum diisi --}}
+                <div id="promptBusinessField"
+                    class="hidden mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
+                    <p class="text-xs text-amber-700 dark:text-amber-400 font-medium">
+                        Bidang usaha belum diisi.
+                        <button onclick="toggleEdit()" class="underline font-semibold hover:text-amber-800 ml-1">Lengkapi sekarang</button>
+                    </p>
                 </div>
             </div>
 
@@ -116,6 +134,17 @@
                         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">Nama Perusahaan</label>
                         <input id="fCompany" type="text" placeholder="PT. Nama Perusahaan"
                             class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white placeholder-gray-400">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wide">
+                            Bidang Usaha
+                            <span class="normal-case text-gray-400 font-normal">(opsional)</span>
+                        </label>
+                        <input id="fBusinessField" type="text"
+                            placeholder="Contoh: Teknologi Informasi, Konstruksi, Perdagangan Umum..."
+                            class="w-full px-3.5 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white placeholder-gray-400">
+                        <p class="text-xs text-gray-400 mt-1">Deskripsikan bidang usaha utama perusahaan Anda.</p>
                     </div>
 
                     <div>
@@ -162,7 +191,7 @@
 <script>
     const getCsrf = () => document.querySelector('meta[name="csrf-token"]')?.content || '';
     let profileData = null;
-    let isEditing = false;
+    let isEditing   = false;
 
     async function loadProfile() {
         try {
@@ -179,38 +208,63 @@
     }
 
     function renderProfile(data) {
-        const supplier = data.supplier || {};
-        const user = data.user || {};
-        const isActive = Number(data.is_active ?? user.is_active ?? 0);
+        const supplier      = data.supplier || {};
+        const user          = data.user     || {};
+        const isActive      = Number(data.is_active ?? user.is_active ?? 0);
+        // Ambil business_field dari supplier 
+        const businessField = supplier.business_field || '';
 
+        // Sidebar
         document.getElementById('sideCompany').textContent = supplier.company_name || '—';
-        document.getElementById('sideName').textContent = user.name || '—';
-        document.getElementById('sideEmail').textContent = user.email || '—';
-        document.getElementById('sidePhone').textContent = supplier.phone || '—';
-        document.getElementById('sideAddress').textContent = supplier.address || '—';
+        document.getElementById('sideName').textContent    = user.name  || '—';
+        document.getElementById('sideEmail').textContent   = user.email || '—';
+        document.getElementById('sidePhone').textContent   = supplier.phone    || '—';
+        document.getElementById('sideAddress').textContent = supplier.address  || '—';
 
+        // Badge bidang usaha di sidebar tampil hanya jika ada isinya
+        const sideBF = document.getElementById('sideBusinessField');
+        if (businessField) {
+            sideBF.textContent = businessField;
+            sideBF.classList.remove('hidden');
+        } else {
+            sideBF.classList.add('hidden');
+        }
+
+        // Status badge
         document.getElementById('sideStatus').innerHTML = isActive === 1
             ? `<span class="px-2.5 py-1 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full text-xs font-medium">Aktif</span>`
             : `<span class="px-2.5 py-1 bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-xs font-medium">Menunggu Aktivasi</span>`;
 
-        document.getElementById('vName').textContent = user.name || '—';
-        document.getElementById('vEmail').textContent = user.email || '—';
+        // View mode
+        document.getElementById('vName').textContent    = user.name            || '—';
+        document.getElementById('vEmail').textContent   = user.email           || '—';
         document.getElementById('vCompany').textContent = supplier.company_name || '—';
-        document.getElementById('vPhone').textContent = supplier.phone || '—';
-        document.getElementById('vNpwp').textContent = supplier.npwp || '—';
-        document.getElementById('vAddress').textContent = supplier.address || '—';
+        document.getElementById('vPhone').textContent   = supplier.phone       || '—';
+        document.getElementById('vNpwp').textContent    = supplier.npwp        || '—';
+        document.getElementById('vAddress').textContent = supplier.address     || '—';
+        document.getElementById('vBusinessField').textContent = businessField || '—';
 
-        document.getElementById('fName').value = user.name || '';
-        document.getElementById('fPhone').value = supplier.phone || '';
-        document.getElementById('fCompany').value = supplier.company_name || '';
-        document.getElementById('fNpwp').value = supplier.npwp || '';
-        document.getElementById('fAddress').value = supplier.address || '';
-        document.getElementById('fPassword').value = '';
+        // Tampilkan pesan jika bidang usaha belum diisi
+        const prompt = document.getElementById('promptBusinessField');
+        if (!businessField) {
+            prompt.classList.remove('hidden');
+        } else {
+            prompt.classList.add('hidden');
+        }
+
+        // Pre-fill form
+        document.getElementById('fName').value           = user.name            || '';
+        document.getElementById('fPhone').value          = supplier.phone       || '';
+        document.getElementById('fCompany').value        = supplier.company_name || '';
+        document.getElementById('fNpwp').value           = supplier.npwp        || '';
+        document.getElementById('fAddress').value        = supplier.address     || '';
+        document.getElementById('fBusinessField').value  = businessField;         
+        document.getElementById('fPassword').value       = '';
     }
 
     function toggleEdit() {
         isEditing = !isEditing;
-        document.getElementById('viewMode').classList.toggle('hidden', isEditing);
+        document.getElementById('viewMode').classList.toggle('hidden',  isEditing);
         document.getElementById('editMode').classList.toggle('hidden', !isEditing);
 
         const btn = document.getElementById('btnEditToggle');
@@ -234,35 +288,47 @@
     }
 
     async function saveProfile() {
-        const pw = document.getElementById('fPassword').value;
+        const pw   = document.getElementById('fPassword').value;
         const body = {
-            name: document.getElementById('fName').value.trim(),
-            company_name: document.getElementById('fCompany').value.trim(),
-            phone: document.getElementById('fPhone').value.trim(),
-            npwp: document.getElementById('fNpwp').value.trim(),
-            address: document.getElementById('fAddress').value.trim(),
+            name:           document.getElementById('fName').value.trim(),
+            company_name:   document.getElementById('fCompany').value.trim(),
+            phone:          document.getElementById('fPhone').value.trim(),
+            npwp:           document.getElementById('fNpwp').value.trim(),
+            address:        document.getElementById('fAddress').value.trim(),
+            business_field: document.getElementById('fBusinessField').value.trim(), 
         };
+
         if (pw) {
             if (pw.length < 8) { showAlert('Password minimal 8 karakter.', 'error'); return; }
             body.password = pw;
         }
         if (!body.name || !body.company_name || !body.phone) {
-            showAlert('Nama, nama perusahaan, dan telepon wajib diisi.', 'error'); return;
+            showAlert('Nama, nama perusahaan, dan telepon wajib diisi.', 'error');
+            return;
         }
+
         try {
             const res = await fetch('/api/supplier/profile', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': getCsrf() },
+                method:  'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept':       'application/json',
+                    'X-CSRF-TOKEN': getCsrf()
+                },
                 body: JSON.stringify(body)
             });
             if (res.status === 401) {
                 showAlert('Sesi Anda telah berakhir. Silakan login kembali.', 'error');
-                setTimeout(() => window.location.href = '/login', 2000); return;
+                setTimeout(() => window.location.href = '/login', 2000);
+                return;
             }
             const json = await res.json();
             if (!res.ok) {
-                const errMsg = json.errors ? Object.values(json.errors).flat().join(' ') : (json.message || 'Gagal menyimpan');
-                showAlert(errMsg, 'error'); return;
+                const errMsg = json.errors
+                    ? Object.values(json.errors).flat().join(' ')
+                    : (json.message || 'Gagal menyimpan');
+                showAlert(errMsg, 'error');
+                return;
             }
             profileData = json;
             renderProfile(json);

@@ -10,7 +10,14 @@ class Supplier extends Model
 
     public $timestamps = true;
 
-    protected $fillable = ['user_id', 'company_name', 'npwp', 'address', 'phone'];
+    protected $fillable = [
+        'user_id',
+        'company_name',
+        'npwp',
+        'address',
+        'phone',
+        'business_field', 
+    ];
 
     public function user()
     {
