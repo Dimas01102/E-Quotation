@@ -18,8 +18,6 @@ class Batch extends Model
         'deadline',
         'status',
         'created_by',
-        // template_file_name dan template_file_path DIHAPUS dari batch
-        // karena template pindah ke tabel rfq_templates (master data)
     ];
 
     protected $casts = [
