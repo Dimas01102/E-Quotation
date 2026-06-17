@@ -18,6 +18,11 @@ class BatchController extends Controller
 {
     public function index()
     {
+         // Auto-close batch yang status-nya 'open' ketika deadline sudah lewat
+        Batch::where('status', 'open')
+            ->whereDate('deadline', '<', now('Asia/Jakarta')->toDateString())
+            ->update(['status' => 'closed']);
+
         $batches = Batch::with('creator')
             ->withCount('batchCategories as category_count')
             ->orderByDesc('created_at')

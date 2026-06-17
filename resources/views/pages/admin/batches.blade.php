@@ -145,7 +145,17 @@
             closed: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
         };
 
-        // Timezone-safe: pakai waktu lokal browser, bukan UTC
+        // Jika status deadline sudah lewat, merubah status open menjadi closed
+        function getEffectiveStatus(b) {
+            if (b.status === 'open' && b.deadline) {
+                const deadline = new Date(b.deadline);
+                deadline.setHours(23, 59, 59, 999); // akhir hari deadline
+                if (deadline < new Date()) return 'closed';
+            }
+            return b.status;
+        }
+
+        // Timezone-safe pakai waktu lokal browser
         function getTodayStr() {
             const d = new Date();
             const y = d.getFullYear();
@@ -204,8 +214,8 @@
                 allBatches = json.batches || [];
 
                 document.getElementById('stTotal').textContent = allBatches.length;
-                document.getElementById('stDraft').textContent = allBatches.filter(b => b.status === 'draft').length;
-                document.getElementById('stOpen').textContent = allBatches.filter(b => b.status === 'open').length;
+                document.getElementById('stDraft').textContent = allBatches.filter(b => getEffectiveStatus(b) === 'draft').length;
+                document.getElementById('stOpen').textContent = allBatches.filter(b => getEffectiveStatus(b) === 'open').length;
 
                 renderTable(allBatches);
             } catch (e) {
@@ -230,7 +240,7 @@
         <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-white text-sm">${b.title}</td>
         <td class="px-5 py-3.5 text-sm ${b.deadline && new Date(b.deadline) < new Date() ? 'text-red-500 font-medium' : 'text-gray-500'}">${fmtDate(b.deadline)}</td>
         <td class="px-5 py-3.5">
-            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusCls[b.status] || 'bg-gray-100 text-gray-600'}">${b.status}</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusCls[getEffectiveStatus(b)] || 'bg-gray-100 text-gray-600'}">${getEffectiveStatus(b)}</span>
         </td>
         <td class="px-5 py-3.5 text-xs text-gray-500">${fmtDate(b.created_at)}</td>
         <td class="px-5 py-3.5 text-right">
