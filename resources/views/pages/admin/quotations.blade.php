@@ -115,17 +115,17 @@
 
 {{-- ── Compare Modal ────────────────────────────────────────────────── --}}
 <div id="compareModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" style="display:none">
-    <div class="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-4xl mx-4 shadow-2xl border border-gray-200 dark:border-gray-700 max-h-[90vh] flex flex-col">
+    <div class="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-5xl mx-4 shadow-2xl border border-gray-200 dark:border-gray-700 max-h-[90vh] flex flex-col">
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
             <div>
                 <h3 class="font-semibold text-gray-800 dark:text-white">Perbandingan Harga</h3>
-                <p class="text-xs text-gray-400 mt-0.5">Diurutkan dari harga terendah ke tertinggi = rekomendasi terbaik</p>
+                <p class="text-xs text-gray-400 mt-0.5">Diurutkan dari harga terendah ke tertinggi rekomendasi terbaik</p>
             </div>
             <button onclick="hideModal('compareModal')" class="text-gray-400 hover:text-gray-600">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <div id="compareContent" class="overflow-auto flex-1 p-6"></div>
+        <div id="compareContent" class="overflow-y-auto flex-1 p-6"></div>
     </div>
 </div>
 
@@ -435,8 +435,10 @@ async function viewDetail(id) {
 }
 
 // ── Compare ───────────────────────────────────────────────────────
+// ── Compare ───────────────────────────────────────────────────────
 async function comparePrice(batchId) {
-    document.getElementById('compareContent').innerHTML = '<div class="text-center py-8 text-gray-400 text-sm animate-pulse">Memuat perbandingan...</div>';
+    document.getElementById('compareContent').innerHTML =
+        '<div class="text-center py-12 text-gray-400 text-sm animate-pulse">Memuat perbandingan...</div>';
     document.getElementById('compareModal').style.display = 'flex';
 
     try {
@@ -446,73 +448,145 @@ async function comparePrice(batchId) {
         const list = json.quotations || [];
 
         if (!list.length) {
-            document.getElementById('compareContent').innerHTML = '<div class="text-center py-8 text-gray-400 text-sm">Belum ada penawaran.</div>';
+            document.getElementById('compareContent').innerHTML =
+                '<div class="text-center py-12 text-gray-400 text-sm">Belum ada penawaran.</div>';
             return;
         }
 
         const lowestPrice = parseFloat(list[0]?.total_price ?? 0);
 
-        document.getElementById('compareContent').innerHTML = `
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 dark:bg-gray-800/60">
-                        <tr>
-                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500">Rank</th>
-                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500">Supplier</th>
-                            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500">File Excel</th>
-                            <th class="text-right px-4 py-3 text-xs font-semibold text-gray-500">Total Harga</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500">Status</th>
-                            <th class="text-right px-4 py-3 text-xs font-semibold text-gray-500">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${list.map((q, i) => {
-                            const isLowest = parseFloat(q.total_price) === lowestPrice && q.status !== 'rejected';
-                            const rankBg   = i === 0 && q.status !== 'rejected'
-                                ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400';
-                            const qStatus = {
-                                pending:'bg-amber-100 text-amber-700',
-                                approved:'bg-green-100 text-green-700',
-                                rejected:'bg-red-100 text-red-600'
-                            };
-                            const actions = q.status === 'pending'
-                                ? `<button onclick="hideModal('compareModal');doApprove(${q.id_quotation})" class="px-2.5 py-1 bg-green-50 hover:bg-green-100 text-green-600 rounded text-xs mr-1 transition-colors">Approve</button>
-                                   <button onclick="hideModal('compareModal');openReject(${q.id_quotation})" class="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded text-xs transition-colors">Reject</button>`
-                                : q.status === 'approved' && q.po_file_path
-                                    ? `<a href="/storage/${q.po_file_path}" target="_blank" class="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded text-xs transition-colors">Download PO</a>`
-                                    : '<span class="text-gray-400 text-xs">—</span>';
-                            return `
-                            <tr class="border-t border-gray-100 dark:border-gray-800 ${isLowest ? 'bg-green-50/40 dark:bg-green-900/5' : ''}">
-                                <td class="px-4 py-3">
-                                    <span class="w-7 h-7 inline-flex items-center justify-center rounded-lg text-xs font-bold ${rankBg}">
-                                        ${i === 0 && q.status !== 'rejected' ? '🥇' : (i+1)}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-3">
-                                    <p class="font-medium text-gray-800 dark:text-white">${esc(q.invited_supplier?.supplier?.company_name)}</p>
-                                    <p class="text-xs text-gray-400">${esc(q.invited_supplier?.supplier?.user?.email)}</p>
-                                </td>
-                                <td class="px-4 py-3">
-                                    ${q.file_path
-                                        ? `<a href="/storage/${q.file_path}" target="_blank" class="text-blue-600 hover:underline text-xs">${esc(q.file_name) || 'Download'}</a>`
-                                        : '—'}
-                                </td>
-                                <td class="px-4 py-3 text-right">
-                                    <p class="font-bold text-sm ${isLowest ? 'text-green-600' : 'text-gray-800 dark:text-white'}">${fmtRp(q.total_price)}</p>
-                                    ${isLowest ? '<p class="text-green-500 text-xs font-medium">✓ Harga Terendah</p>' : ''}
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-medium ${qStatus[q.status] || 'bg-gray-100 text-gray-500'}">${capitalize(q.status)}</span>
-                                </td>
-                                <td class="px-4 py-3 text-right">${actions}</td>
-                            </tr>`;
-                        }).join('')}
-                    </tbody>
-                </table>
+        const iconFile = `<svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>`;
+        const iconCheck = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
+        const iconDownload = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a2 2 0 002 2h14a2 2 0 002-2v-3"/></svg>`;
+        const iconClose = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>`;
+        const iconTrophy = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21h8m-4-4v4M5 3H3a2 2 0 000 4c0 2.4 1.6 4.5 4 5.3M19 3h2a2 2 0 010 4c0 2.4-1.6 4.5-4 5.3M5 3h14v6a7 7 0 01-14 0V3z"/></svg>`;
+
+        const statusBadge = {
+            pending:  'bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800',
+            approved: 'bg-green-50 text-green-600 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800',
+            rejected: 'bg-red-50 text-red-500 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800',
+        };
+
+        const cards = list.map((q, i) => {
+            const isLowest   = parseFloat(q.total_price) === lowestPrice && q.status !== 'rejected';
+            const isFirst    = i === 0 && q.status !== 'rejected';
+            const isRejected = q.status === 'rejected';
+
+            // Accent bar color top of card
+            const accentBar = isFirst
+                ? 'before:absolute before:inset-x-0 before:top-0 before:h-1 before:rounded-t-xl before:bg-gradient-to-r before:from-amber-400 before:to-yellow-300'
+                : isLowest
+                    ? 'before:absolute before:inset-x-0 before:top-0 before:h-1 before:rounded-t-xl before:bg-green-400'
+                    : '';
+
+            const rankDisplay = isFirst
+                ? `<span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-600 dark:bg-amber-900/20 dark:border-amber-700 dark:text-amber-400">
+                        ${iconTrophy}
+                   </span>`
+                : `<span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-sm font-semibold">
+                        ${i + 1}
+                   </span>`;
+
+            const winnerBadge = isLowest
+                ? `<span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800 font-medium">
+                        ${iconCheck} Harga Terendah
+                   </span>`
+                : '';
+
+            const priceClass = isRejected
+                ? 'line-through text-gray-400'
+                : isLowest
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-gray-800 dark:text-white';
+
+            const fileName = esc(q.file_name) || 'Download';
+
+            const fileSection = q.file_path
+                ? `<a href="/storage/${q.file_path}" target="_blank"
+                      class="flex items-center gap-1.5 text-xs text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 transition-colors min-w-0 group">
+                       <span class="flex-shrink-0">${iconFile}</span>
+                       <span class="truncate group-hover:underline" title="${fileName}">${fileName}</span>
+                   </a>`
+                : `<span class="text-xs text-gray-300 dark:text-gray-600">Tidak ada file</span>`;
+
+            const actions = q.status === 'pending'
+                ? `<button onclick="hideModal('compareModal');doApprove(${q.id_quotation})"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 dark:hover:bg-green-900/40 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800 rounded-lg text-xs font-medium transition-colors">
+                        ${iconCheck} Approve
+                   </button>
+                   <button onclick="hideModal('compareModal');openReject(${q.id_quotation})"
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 text-red-500 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-lg text-xs font-medium transition-colors">
+                        ${iconClose} Reject
+                   </button>`
+                : q.status === 'approved' && q.po_file_path
+                    ? `<a href="/storage/${q.po_file_path}" target="_blank"
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-lg text-xs font-medium transition-colors">
+                            ${iconDownload} Download PO
+                       </a>`
+                    : `<span class="text-gray-400 text-xs">—</span>`;
+
+            // Card border style
+            const cardBorder = isLowest
+                ? 'border-green-300 dark:border-green-700 ring-1 ring-green-200 dark:ring-green-900'
+                : 'border-gray-200 dark:border-gray-800';
+
+            return `
+            <div class="relative bg-white dark:bg-gray-900 rounded-xl border ${cardBorder}
+                        shadow-sm hover:shadow-md transition-shadow duration-200
+                        p-4 flex flex-col gap-3 overflow-hidden ${isRejected ? 'opacity-55' : ''} ${accentBar}">
+
+                {{-- Top row: rank + status badge --}}
+                <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        ${rankDisplay}
+                        ${winnerBadge}
+                    </div>
+                    <span class="flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${statusBadge[q.status] || 'bg-gray-100 text-gray-500'}">
+                        ${capitalize(q.status)}
+                    </span>
+                </div>
+
+                {{-- Supplier info --}}
+                <div class="min-w-0">
+                    <p class="font-semibold text-sm text-gray-800 dark:text-white leading-snug truncate">
+                        ${esc(q.invited_supplier?.supplier?.company_name)}
+                    </p>
+                    <p class="text-xs text-gray-400 mt-0.5 truncate">
+                        ${esc(q.invited_supplier?.supplier?.user?.email)}
+                    </p>
+                    ${q.submitted_at
+                        ? `<p class="text-xs text-gray-400 mt-0.5">Submit: ${new Date(q.submitted_at).toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})}</p>`
+                        : ''}
+                </div>
+
+                <div class="border-t border-gray-100 dark:border-gray-800"></div>
+
+                {{-- Price --}}
+                <div>
+                    <p class="text-xs text-gray-400 mb-0.5">Total harga</p>
+                    <p class="font-bold text-lg leading-tight ${priceClass}">${fmtRp(q.total_price)}</p>
+                </div>
+
+                {{-- File --}}
+                <div class="min-w-0">
+                    ${fileSection}
+                </div>
+
+                <div class="border-t border-gray-100 dark:border-gray-800"></div>
+
+                {{-- Actions --}}
+                <div class="flex items-center gap-2 flex-wrap">
+                    ${actions}
+                </div>
             </div>`;
+        }).join('');
+
+        document.getElementById('compareContent').innerHTML =
+            `<div class="grid grid-cols-3 gap-4">${cards}</div>`;
+
     } catch(e) {
-        document.getElementById('compareContent').innerHTML = `<div class="text-center py-8 text-red-400 text-sm">Gagal: ${e.message}</div>`;
+        document.getElementById('compareContent').innerHTML =
+            `<div class="text-center py-8 text-red-400 text-sm">Gagal: ${e.message}</div>`;
     }
 }
 

@@ -6,7 +6,6 @@
     <title>Purchase Order {{ $poNumber }}</title>
 
     <style>
-        /* ── Reset ── */
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -14,7 +13,7 @@
             font-size: 9px;
             color: #1a1a2e;
             background: #ffffff;
-            padding: 30px 36px;
+            padding: 24px 28px;
             line-height: 1.5;
         }
 
@@ -73,13 +72,13 @@
         .info-section {
             display: table;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             overflow: hidden;
         }
-        .info-col-to   { display: table-cell; width: 50%; padding: 12px 14px; vertical-align: top; border-right: 1px solid #e2e8f0; }
-        .info-col-meta { display: table-cell; width: 50%; padding: 12px 14px; vertical-align: top; background: #f8fafc; }
+        .info-col-to   { display: table-cell; width: 50%; padding: 10px 14px; vertical-align: top; border-right: 1px solid #e2e8f0; }
+        .info-col-meta { display: table-cell; width: 50%; padding: 10px 14px; vertical-align: top; background: #f8fafc; }
 
         .info-group-title {
             font-size: 7.5px;
@@ -87,12 +86,12 @@
             color: #94a3b8;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             padding-bottom: 4px;
             border-bottom: 1px solid #e2e8f0;
         }
 
-        .info-row       { display: table; width: 100%; margin-bottom: 4px; }
+        .info-row       { display: table; width: 100%; margin-bottom: 3px; }
         .info-key       { display: table-cell; width: 38%; font-size: 8px; color: #94a3b8; vertical-align: top; }
         .info-val       { display: table-cell; font-size: 8.5px; font-weight: 600; color: #1e293b; vertical-align: top; }
         .info-val.large { font-size: 11px; font-weight: 900; color: #0e7490; }
@@ -111,8 +110,9 @@
 
         table.items {
             width: 100%;
+            table-layout: fixed;     
             border-collapse: collapse;
-            font-size: 7px;
+            font-size: 6.5px;
             margin-bottom: 0;
         }
 
@@ -122,14 +122,15 @@
             border-bottom: 1px solid #cbd5e1;
         }
         table.items thead th {
-            padding: 6px 7px;
+            padding: 5px 4px;
             text-align: left;
             font-weight: 700;
-            font-size: 7px;
+            font-size: 6.5px;
             color: #334155;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
+            letter-spacing: 0.2px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         table.items thead th.th-right  { text-align: right; }
         table.items thead th.th-center { text-align: center; }
@@ -139,8 +140,10 @@
         table.items tbody tr:nth-child(odd)  { background: #ffffff; }
 
         table.items tbody td {
-            padding: 5px 7px;
+            padding: 4px 4px;
             vertical-align: top;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
         .td-right  { text-align: right; }
         .td-center { text-align: center; }
@@ -149,7 +152,7 @@
         table.items tbody tr.empty-row td { height: 22px; }
 
         /* ════════════════════════════════
-           TOTALS + NOTES (bawah tabel)
+           TOTALS + NOTES 
         ════════════════════════════════ */
         .bottom-section {
             display: table;
@@ -160,8 +163,8 @@
             border-radius: 0 0 6px 6px;
             overflow: hidden;
         }
-        .notes-col  { display: table-cell; width: 55%; padding: 12px 14px; vertical-align: top; border-right: 1px solid #e2e8f0; }
-        .totals-col { display: table-cell; width: 45%; padding: 12px 14px; vertical-align: top; background: #f8fafc; }
+        .notes-col  { display: table-cell; width: 55%; padding: 10px 14px; vertical-align: top; border-right: 1px solid #e2e8f0; }
+        .totals-col { display: table-cell; width: 45%; padding: 10px 14px; vertical-align: top; background: #f8fafc; }
 
         .notes-title {
             font-size: 7.5px;
@@ -203,7 +206,7 @@
         /* ════════════════════════════════
            SIGNATURE 2 kolom
         ════════════════════════════════ */
-        .sig-section { margin-top: 24px; }
+        .sig-section { margin-top: 18px; }
 
         .sig-section-title {
             font-size: 7.5px;
@@ -211,7 +214,7 @@
             color: #94a3b8;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             padding-bottom: 4px;
             border-bottom: 1px solid #e2e8f0;
         }
@@ -222,7 +225,7 @@
             display: table-cell;
             width: 50%;
             text-align: center;
-            padding: 14px 20px 12px;
+            padding: 12px 20px 10px;
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             background: #f8fafc;
@@ -238,9 +241,9 @@
             margin-bottom: 8px;
         }
 
-        /* Area TTD — kosong untuk tanda tangan fisik / digital */
+        /* Area TTD kosong untuk tanda tangan fisik / digital */
         .sig-area {
-            height: 50px;
+            height: 44px;
             border: 1px dashed #cbd5e1;
             border-radius: 4px;
             background: #ffffff;
@@ -251,7 +254,7 @@
             overflow: hidden;
         }
         .sig-area img {
-            max-height: 46px;
+            max-height: 40px;
             max-width: 100%;
             object-fit: contain;
         }
@@ -269,7 +272,7 @@
            FOOTER
         ════════════════════════════════ */
         .doc-footer {
-            margin-top: 20px;
+            margin-top: 16px;
             padding-top: 10px;
             border-top: 1px solid #e2e8f0;
             text-align: center;
@@ -290,8 +293,8 @@
 
         /* ── Print overrides ── */
         @media print {
-            body { padding: 18px 22px; }
-            @page { size: A4 portrait; margin: 12mm 14mm; }
+            body { padding: 14px 18px; }
+            @page { size: A4 landscape; margin: 10mm 12mm; }
         }
     </style>
 </head>
@@ -396,24 +399,24 @@
     <table class="items">
         <thead>
             <tr>
-                <th style="width:24px;">#</th>
-                <th>Coll No.</th>
-                <th>RFQ No.</th>
-                <th>Vendor</th>
-                <th class="th-center">No. Item</th>
-                <th>Material No.</th>
-                <th>Description</th>
-                <th class="th-center">Qty</th>
-                <th class="th-center">UoM</th>
-                <th class="th-center">Currency</th>
-                <th class="th-right">Net Price</th>
-                <th>Incoterm</th>
-                <th>Destination</th>
-                <th>Remark 1</th>
-                <th>Remark 2</th>
-                <th class="th-center">Lead Time (Wks)</th>
-                <th>Payment Term</th>
-                <th>Quotation Date</th>
+                <th style="width:2%;">#</th>
+                <th style="width:5%;">Coll No.</th>
+                <th style="width:6%;">RFQ No.</th>
+                <th style="width:7%;">Vendor</th>
+                <th class="th-center" style="width:4%;">No. Item</th>
+                <th style="width:6%;">Material No.</th>
+                <th style="width:14%;">Description</th>
+                <th class="th-center" style="width:3%;">Qty</th>
+                <th class="th-center" style="width:3%;">UoM</th>
+                <th class="th-center" style="width:4%;">Currency</th>
+                <th class="th-right" style="width:7%;">Net Price</th>
+                <th style="width:5%;">Incoterm</th>
+                <th style="width:6%;">Destination</th>
+                <th style="width:6%;">Remark 1</th>
+                <th style="width:6%;">Remark 2</th>
+                <th class="th-center" style="width:5%;">Lead Time (Wks)</th>
+                <th style="width:6%;">Payment Term</th>
+                <th style="width:5%;">Quotation Date</th>
             </tr>
         </thead>
         <tbody>
