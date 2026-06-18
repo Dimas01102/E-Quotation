@@ -404,6 +404,11 @@
         rejected: 'bg-red-100 text-red-600'
     };
 
+    function capitalize(str) {
+        if (!str) return '—';
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
     // ✅ Timezone-safe: pakai waktu lokal browser, bukan UTC
     function getTodayStr() {
         const d = new Date();
@@ -458,7 +463,7 @@
             document.getElementById('infoQuotations').textContent = (json.quotations || []).length;
 
             const badge = document.getElementById('batchStatusBadge');
-            badge.textContent = b.status?.toUpperCase();
+            badge.textContent = capitalize(b.status);
             badge.className = 'px-2.5 py-1 rounded-full text-xs font-medium ' + (statusCls[b.status] || 'bg-gray-100 text-gray-600');
 
             renderCatList(batchCategories);
@@ -539,7 +544,7 @@
                 '<p class="text-xs text-gray-400">' + (inv.supplier?.user?.email || '') + '</p></td>' +
                 '<td class="px-5 py-3.5 text-sm text-gray-500">' + catName + '</td>' +
                 '<td class="px-5 py-3.5 text-xs text-gray-400">' + fmtDate(inv.invited_at) + '</td>' +
-                '<td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (invCls[inv.status] || 'bg-gray-100 text-gray-500') + '">' + (inv.status || '—') + '</span></td></tr>';
+                '<td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (invCls[inv.status] || 'bg-gray-100 text-gray-500') + '">' + capitalize(inv.status) + '</span></td></tr>';
         }).join('');
     }
 
@@ -563,7 +568,7 @@
                 '<td class="px-5 py-3.5"><p class="font-medium text-gray-800 dark:text-white text-sm">' + (q.invited_supplier?.supplier?.company_name || '—') + '</p></td>' +
                 '<td class="px-5 py-3.5">' + (q.file_path ? '<a href="/storage/' + q.file_path + '" target="_blank" class="text-blue-600 hover:underline text-xs">' + (q.file_name || 'Download') + '</a>' : '—') + '</td>' +
                 '<td class="px-5 py-3.5 text-right font-semibold ' + (q.status === 'approved' ? 'text-green-600' : 'text-gray-800 dark:text-white') + '">' + fmtRp(q.total_price) + '</td>' +
-                '<td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (quotCls[q.status] || '') + '">' + (q.status || '—') + '</span></td>' +
+                '<td class="px-5 py-3.5"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (quotCls[q.status] || '') + '">' + capitalize(q.status) + '</span></td>' +
                 '<td class="px-5 py-3.5 text-right"><div class="flex items-center justify-end gap-2">' + actions + '</div></td></tr>';
         }).join('');
     }
@@ -582,7 +587,7 @@
         document.getElementById('editTitle').value = b.title;
         document.getElementById('editDesc').value = b.description || '';
         document.getElementById('editDeadline').value = b.deadline ? b.deadline.toString().substring(0, 10) : '';
-        document.getElementById('editDeadline').min = getTodayStr(); // ✅ fix
+        document.getElementById('editDeadline').min = getTodayStr();
         document.getElementById('editStatus').value = b.status;
         document.getElementById('alertEdit').classList.add('hidden');
         showModal('modalEdit');
@@ -818,7 +823,7 @@
                         '<td class="px-4 py-3"><span class="w-7 h-7 inline-flex items-center justify-center rounded-lg text-xs font-bold ' + rankBg + '">' + (i === 0 && q.status !== 'rejected' ? '🥇' : i + 1) + '</span></td>' +
                         '<td class="px-4 py-3"><p class="font-medium text-sm text-gray-800 dark:text-white">' + (q.invited_supplier?.supplier?.company_name || '—') + '</p></td>' +
                         '<td class="px-4 py-3 text-right"><p class="font-bold text-sm ' + (isLowest ? 'text-green-600' : 'text-gray-800') + '">' + fmtRp(q.total_price) + '</p>' + (isLowest ? '<p class="text-green-500 text-xs">Terendah ✓</p>' : '') + '</td>' +
-                        '<td class="px-4 py-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (quotCls[q.status] || '') + '">' + q.status + '</span></td>' +
+                        '<td class="px-4 py-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-medium ' + (quotCls[q.status] || '') + '">' + capitalize(q.status) + '</span></td>' +
                         '<td class="px-4 py-3 text-right">' + actions + '</td></tr>';
                 }).join('') + '</tbody></table></div>';
             showModal('compareModal');

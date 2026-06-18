@@ -215,6 +215,10 @@
                 day: 'numeric', month: 'short', year: 'numeric'
             }) : '—';
         };
+        window.capitalize = function(str) {
+            if (!str) return '—';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        };
         window.statusBadge = function (s) {
             const m = {
                 open:      'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
@@ -228,7 +232,7 @@
             };
             return '<span class="px-2.5 py-1 rounded-full text-xs font-medium ' +
                 (m[s] || 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400') +
-                '">' + (s || '—') + '</span>';
+                '">' + window.capitalize(s) + '</span>';
         };
         window.showToast = window.toast = function (msg, type) {
             const t  = document.createElement('div');

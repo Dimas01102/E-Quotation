@@ -145,6 +145,11 @@
             closed: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
         };
 
+        function capitalize(str) {
+            if (!str) return '—';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
         // Jika status deadline sudah lewat, merubah status open menjadi closed
         function getEffectiveStatus(b) {
             if (b.status === 'open' && b.deadline) {
@@ -240,7 +245,7 @@
         <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-white text-sm">${b.title}</td>
         <td class="px-5 py-3.5 text-sm ${b.deadline && new Date(b.deadline) < new Date() ? 'text-red-500 font-medium' : 'text-gray-500'}">${fmtDate(b.deadline)}</td>
         <td class="px-5 py-3.5">
-            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusCls[getEffectiveStatus(b)] || 'bg-gray-100 text-gray-600'}">${getEffectiveStatus(b)}</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusCls[getEffectiveStatus(b)] || 'bg-gray-100 text-gray-600'}">${capitalize(getEffectiveStatus(b))}</span>
         </td>
         <td class="px-5 py-3.5 text-xs text-gray-500">${fmtDate(b.created_at)}</td>
         <td class="px-5 py-3.5 text-right">

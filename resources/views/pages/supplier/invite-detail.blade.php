@@ -153,6 +153,12 @@
     <script>
         const INVITE_ID = {{ $inviteId }};
 
+        // Mengubah huruf pertama status menjadi upprcase
+        function capFirst(s) {
+            if (!s) return s;
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+
         async function loadDetail() {
             const r = await API.get(`/supplier/invitations/${INVITE_ID}`);
             if (!r.success) {
@@ -207,11 +213,11 @@
                 document.getElementById('already-wrap').classList.remove('hidden');
                 if (latestQuo) {
                     document.getElementById('submitted-info').textContent =
-                        `Penawaran #${latestQuo.id_quotation} (Total: ${fmtRp(latestQuo.total_price)}) berhasil dikirim. Status: ${latestQuo.status}`;
+                        `Penawaran #${latestQuo.id_quotation} (Total: ${fmtRp(latestQuo.total_price)}) berhasil dikirim. Status: ${capFirst(latestQuo.status)}`;
                 }
                 if (batch?.status !== 'open') {
                     document.getElementById('submitted-info').textContent =
-                        `Batch RFQ ini sudah ${batch?.status}. Penawaran tidak dapat disubmit.`;
+                        `Batch RFQ ini sudah ${capFirst(batch?.status)}. Penawaran tidak dapat disubmit.`;
                 }
             }
         }

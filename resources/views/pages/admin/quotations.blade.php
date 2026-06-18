@@ -94,7 +94,7 @@
         <div class="flex-1 overflow-auto">
             <div class="px-6 pt-4 pb-2 flex items-center justify-between">
                 <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    Detail Item — 17 kolom sesuai file Excel
+                    Detail Item 17 kolom sesuai file Excel
                 </p>
                 <span id="dtCount" class="text-xs text-gray-400"></span>
             </div>
@@ -119,7 +119,7 @@
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
             <div>
                 <h3 class="font-semibold text-gray-800 dark:text-white">Perbandingan Harga</h3>
-                <p class="text-xs text-gray-400 mt-0.5">Diurutkan dari harga terendah — terendah = rekomendasi terbaik</p>
+                <p class="text-xs text-gray-400 mt-0.5">Diurutkan dari harga terendah ke tertinggi = rekomendasi terbaik</p>
             </div>
             <button onclick="hideModal('compareModal')" class="text-gray-400 hover:text-gray-600">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -147,7 +147,6 @@
 
 @push('scripts')
 <script>
-// ✅ Tidak ada const CSRF, function fmtDate, function fmtRp — pakai dari layout global
 let allQ = [];
 
 const sCls = {
@@ -191,9 +190,9 @@ function renderTable(list) {
     tb.innerHTML = list.map((q, i) => {
         const company  = q.invited_supplier?.supplier?.company_name ?? '—';
         const picName  = q.invited_supplier?.supplier?.user?.name ?? '';
-        // ✅ No. RFQ — kolom sendiri
+        // No. RFQ — kolom sendiri
         const batchNum = q.invited_supplier?.batch_category?.batch?.batch_number ?? '—';
-        // ✅ Kategori — kolom sendiri (tidak digabung dengan batch title)
+        // Kategori — kolom sendiri (tidak digabung dengan batch title)
         const catName  = q.invited_supplier?.batch_category?.master_category?.name ?? '—';
         const batchId  = q.invited_supplier?.batch_category?.id_batch ?? null;
 
@@ -204,11 +203,11 @@ function renderTable(list) {
                 <p class="font-medium text-gray-800 dark:text-white text-sm">${esc(company)}</p>
                 <p class="text-xs text-gray-400 mt-0.5">${esc(picName)}</p>
             </td>
-            {{-- ✅ Kolom No. RFQ --}}
+            {{-- Kolom No. RFQ --}}
             <td class="px-4 py-3.5">
                 <span class="font-mono text-sm font-bold text-blue-600 dark:text-blue-400">${esc(batchNum)}</span>
             </td>
-            {{-- ✅ Kolom Kategori --}}
+            {{-- Kolom Kategori --}}
             <td class="px-4 py-3.5">
                 <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-full text-xs font-medium">${esc(catName)}</span>
             </td>
@@ -231,7 +230,7 @@ function renderTable(list) {
             <td class="px-4 py-3.5 text-xs text-gray-500 whitespace-nowrap">${fmtDate(q.submitted_at)}</td>
             <td class="px-4 py-3.5 text-center">
                 <span class="px-2.5 py-1 rounded-full text-xs font-medium ${sCls[q.status] || 'bg-gray-100 text-gray-600'}">
-                    ${q.status || '—'}
+                    ${capitalize(q.status)}
                 </span>
             </td>
             <td class="px-4 py-3.5 text-right">
@@ -290,7 +289,7 @@ async function viewDetail(id) {
         if (!res.ok) throw new Error(json.message || 'Error');
         const q = json.quotation;
 
-        // ✅ Info bar — 6 kolom: Supplier, No. RFQ, Kategori, Total, Tgl Submit, Status
+        // Info bar 6 kolom: Supplier, No. RFQ, Kategori, Total, Tgl Submit, Status
         const company  = q.invited_supplier?.supplier?.company_name ?? '—';
         const batchNum = q.invited_supplier?.batch_category?.batch?.batch_number ?? '—';
         const catName  = q.invited_supplier?.batch_category?.master_category?.name ?? '—';
@@ -321,7 +320,7 @@ async function viewDetail(id) {
             </div>
             <div>
                 <p class="text-xs text-gray-400 mb-0.5">Status</p>
-                <span class="px-2.5 py-1 rounded-full text-xs font-medium ${sCls[q.status] || 'bg-gray-100 text-gray-600'}">${q.status || '—'}</span>
+                <span class="px-2.5 py-1 rounded-full text-xs font-medium ${sCls[q.status] || 'bg-gray-100 text-gray-600'}">${capitalize(q.status)}</span>
             </div>`;
 
         // Download actions
@@ -504,7 +503,7 @@ async function comparePrice(batchId) {
                                     ${isLowest ? '<p class="text-green-500 text-xs font-medium">✓ Harga Terendah</p>' : ''}
                                 </td>
                                 <td class="px-4 py-3 text-center">
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-medium ${qStatus[q.status] || 'bg-gray-100 text-gray-500'}">${q.status ?? '—'}</span>
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-medium ${qStatus[q.status] || 'bg-gray-100 text-gray-500'}">${capitalize(q.status)}</span>
                                 </td>
                                 <td class="px-4 py-3 text-right">${actions}</td>
                             </tr>`;

@@ -352,6 +352,11 @@
             return 'Rp ' + parseInt(n).toLocaleString('id-ID');
         };
 
+        window.capitalize = function(str) {
+            if (!str) return '—';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        };
+
         window.statusBadge = window.badge = function(s) {
             const m = {
                 open: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
@@ -366,7 +371,7 @@
             };
             return '<span class="px-2.5 py-1 rounded-full text-xs font-medium ' +
                 (m[s] || 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400') +
-                '">' + (s || '—') + '</span>';
+                '">' + window.capitalize(s) + '</span>';
         };
 
         window.toast = function(msg, type) {

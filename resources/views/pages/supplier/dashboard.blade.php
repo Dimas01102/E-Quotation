@@ -141,7 +141,7 @@
                         </div>
                         <span class="px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
                             inv.status === 'submitted' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                        }">${inv.status || '—'}</span>
+                        }">${capitalize(inv.status)}</span>
                     </div>
                 </div>`).join('') :
                     '<div class="px-5 py-6 text-center text-sm text-gray-400">Belum ada undangan RFQ</div>';
@@ -160,7 +160,7 @@
                             q.status === 'approved' ? 'bg-green-100 text-green-700' :
                             q.status === 'rejected' ? 'bg-red-100 text-red-600' :
                             'bg-amber-100 text-amber-700'
-                        }">${q.status || '—'}</span>
+                        }">${capitalize(q.status)}</span>
                     </div>
                 </div>`).join('') :
                     '<div class="px-5 py-6 text-center text-sm text-gray-400">Belum ada penawaran dikirim</div>';

@@ -134,7 +134,7 @@
                 document.getElementById('batchStatusChart').innerHTML = (data.batch_by_status || []).map(s => `
             <div>
                 <div class="flex justify-between text-xs text-gray-500 mb-1">
-                    <span class="capitalize font-medium">${s.status || 'unknown'}</span>
+                    <span class="capitalize font-medium">${capitalize(s.status)}</span>
                     <span>${s.count} batch</span>
                 </div>
                 <div class="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">

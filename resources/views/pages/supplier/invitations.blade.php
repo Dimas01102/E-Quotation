@@ -87,6 +87,12 @@
             return n ? 'Rp ' + parseInt(n).toLocaleString('id-ID') : '—';
         }
 
+        // Mengubah huruf pertama status menjadi uppercase
+        function capFirst(s) {
+            if (!s) return s;
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+
         const statusCls = {
             invited: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
             submitted: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
@@ -151,11 +157,11 @@
                         </div>
                     </div>` : '';
 
-                // Tampilkan info penawaran sebelumnya jika winner & can_submit (latestQuotation ada)
+                // Tampilkan info penawaran sebelumnya jika winner & can_submit (latestQuotation)
                 const prevQuotationInfo = isWinner && canSubmit && latestQuotation ? `
                     <div class="mt-2 inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-xl text-xs text-gray-500 dark:text-gray-400">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Penawaran terakhir: ${fmtRp(latestQuotation.total_price)} · ${latestQuotation.status}
+                        Penawaran terakhir: ${fmtRp(latestQuotation.total_price)} · ${capFirst(latestQuotation.status)}
                     </div>` : '';
 
                 // Info penawaran sudah terkirim (supplier biasa, bukan winner re-submit)
@@ -192,7 +198,7 @@
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap mb-1">
                         <span class="text-xs text-gray-400 font-mono">No. RFQ: ${batch.batch_number || '—'}</span>
-                        <span class="px-2 py-0.5 rounded-full text-xs font-medium ${statusCls[inv.status] || 'bg-gray-100 text-gray-600'}">${inv.status || '—'}</span>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium ${statusCls[inv.status] || 'bg-gray-100 text-gray-600'}">${inv.status ? capFirst(inv.status) : '—'}</span>
                         ${isWinner ? '<span class="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-xs font-medium">🏆 Pemenang</span>' : ''}
                         ${isExpired ? '<span class="px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs">Expired</span>' : ''}
                     </div>
@@ -233,7 +239,7 @@
             const items    = inv.items || [];
             const isWinner  = inv.is_winner;
             const canSubmit = inv.can_submit;
-            // Untuk modal: selalu pakai latest_quotation sebagai referensi history
+            // Untuk modal selalu memakai latest_quotation sebagai referensi history
             const displayQuotation = inv.latest_quotation;
 
             document.getElementById('modalBatchTitle').textContent = batch.title || 'Detail';
@@ -242,7 +248,7 @@
             <div class="grid grid-cols-2 gap-4 text-sm">
                 <div><p class="text-xs text-gray-400 mb-1">No. RFQ</p><p class="font-mono font-medium text-gray-800 dark:text-white">${batch.batch_number || '—'}</p></div>
                 <div><p class="text-xs text-gray-400 mb-1">Status Batch</p>
-                    <span class="px-2 py-0.5 rounded-full text-xs font-medium ${batch.status === 'open' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">${batch.status || '—'}</span>
+                    <span class="px-2 py-0.5 rounded-full text-xs font-medium ${batch.status === 'open' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">${batch.status ? capFirst(batch.status) : '—'}</span>
                 </div>
                 <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Deskripsi</p><p class="text-gray-700 dark:text-gray-300">${batch.description || '—'}</p></div>
                 <div><p class="text-xs text-gray-400 mb-1">Kategori</p><p class="font-medium text-gray-800 dark:text-white">${category.name || '—'}</p></div>
@@ -271,7 +277,7 @@
                     </div>
                 </div>` : ''}
 
-            ${/* Winner yang batch-nya dibuka ulang → tampilkan riwayat + tombol ajukan ulang */ ''}
+            ${/* Winner yang batch-nya dibuka ulang tampilkan riwayat + tombol ajukan ulang */ ''}
             ${isWinner && canSubmit ? `
                 <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
                     <p class="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase mb-2">🏆 Pengadaan Dibuka Ulang — Anda Pemenang Sebelumnya</p>
@@ -279,7 +285,7 @@
                     <div class="grid grid-cols-2 gap-3 text-sm mb-3">
                         <div><p class="text-xs text-gray-400">Penawaran Terakhir</p><p class="font-bold text-gray-800 dark:text-white">${fmtRp(displayQuotation.total_price)}</p></div>
                         <div><p class="text-xs text-gray-400">Status Lama</p>
-                            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">approved</span>
+                            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">Approved</span>
                         </div>
                     </div>` : ''}
                     <p class="text-xs text-amber-600 dark:text-amber-500 mb-3">Admin meminta Anda mengajukan penawaran baru. Silakan upload file penawaran terbaru di halaman Penawaran Saya.</p>
@@ -300,7 +306,7 @@
                                 displayQuotation.status === 'approved' ? 'bg-green-100 text-green-700' :
                                 displayQuotation.status === 'rejected' ? 'bg-red-100 text-red-600' :
                                 'bg-amber-100 text-amber-700'
-                            }">${displayQuotation.status}</span>
+                            }">${capFirst(displayQuotation.status)}</span>
                         </div>
                     </div>
                 </div>` : `
