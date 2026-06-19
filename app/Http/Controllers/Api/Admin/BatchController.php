@@ -95,13 +95,9 @@ class BatchController extends Controller
             'status'      => 'sometimes|required|in:draft,open,closed',
         ]);
 
-        $oldStatus   = $batch->status;
-        $oldDeadline = (string) $batch->deadline;
+        $oldStatus = $batch->status;
 
         $batch->update($request->only(['title', 'description', 'deadline', 'status']));
-
-        $newDeadline     = $request->deadline;
-        $deadlineChanged = $newDeadline && $newDeadline !== $oldDeadline;
 
         $reopened = $request->has('status')
             && in_array($request->status, ['open', 'draft'])
@@ -109,10 +105,7 @@ class BatchController extends Controller
 
         if ($reopened) {
             $this->reopenForWinnersOnly($batch->fresh());
-        }
-
-        if ($reopened || $deadlineChanged) {
-            $this->notifyWinnersOnReopen($batch->fresh(), $deadlineChanged ? $newDeadline : null);
+            $this->notifyWinnersOnReopen($batch->fresh(), null);
         }
 
         return response()->json([
