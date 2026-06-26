@@ -11,9 +11,9 @@
             </div>
             <p class="text-2xl font-bold text-gray-900 dark:text-white" id="stat-suppliers">—</p>
             <p class="text-xs text-gray-500 mt-0.5">Total Supplier</p>
-            <p class="text-xs mt-1 font-medium">
-                <span id="stat-active-s" class="text-green-600">—</span> aktif ·
-                <span id="stat-pending-s" class="text-amber-600">—</span> pending
+            <p class="text-xs mt-1 font-medium text-gray-700 dark:text-gray-300">
+                <span id="stat-active-s" class="text-green-600 dark:text-green-400">—</span> aktif ·
+                <span id="stat-pending-s" class="text-amber-600 dark:text-amber-400">—</span> pending
             </p>
         </div>
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5">
@@ -22,10 +22,10 @@
             </div>
             <p class="text-2xl font-bold text-gray-900 dark:text-white" id="stat-batch">—</p>
             <p class="text-xs text-gray-500 mt-0.5">Total Batch RFQ</p>
-            <p class="text-xs mt-1 font-medium">
-                <span id="stat-open-batch" class="text-emerald-600">—</span> open ·
-                <span id="stat-draft-batch" class="text-gray-500">—</span> draft
-            </p>
+          <p class="text-xs mt-1 font-medium text-gray-700 dark:text-gray-300">
+            <span id="stat-open-batch" class="text-emerald-600 dark:text-emerald-400">—</span> open ·
+            <span id="stat-draft-batch" class="text-gray-500 dark:text-gray-400">—</span> draft
+        </p>
         </div>
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-5">
             <div class="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-3">
@@ -40,7 +40,7 @@
                 <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             </div>
             <p class="text-2xl font-bold text-gray-900 dark:text-white" id="stat-approved">—</p>
-            <p class="text-xs text-gray-500 mt-0.5">Quotation Disetujui</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Quotation Disetujui</p>
         </div>
     </div>
 
@@ -50,7 +50,14 @@
         <svg class="h-5 w-5 flex-shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         <p class="flex-1 text-sm text-amber-700 dark:text-amber-300">
             <span id="pending-count" class="font-bold"></span> supplier menunggu aktivasi.
-            <a href="/admin/suppliers" class="font-semibold underline">Aktivasi sekarang →</a>
+            <a href="/admin/suppliers" class="inline-flex items-center gap-1 font-semibold underline">
+                Aktivasi sekarang
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
         </p>
     </div>
 
@@ -59,7 +66,15 @@
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
             <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-5 py-4">
                 <h3 class="text-sm font-bold text-gray-800 dark:text-white">Batch RFQ Terbaru</h3>
-                <a href="/admin/batches" class="text-xs font-medium text-blue-500 hover:text-blue-600">Lihat semua →</a>
+                <a href="/admin/batches"
+                class="inline-flex items-center gap-1 text-xs font-medium text-blue-500 hover:text-blue-600">
+                    Lihat semua
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -78,7 +93,15 @@
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
             <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 px-5 py-4">
                 <h3 class="text-sm font-bold text-gray-800 dark:text-white">Quotation Terbaru</h3>
-                <a href="/admin/quotations" class="text-xs font-medium text-blue-500 hover:text-blue-600">Lihat semua →</a>
+                <a href="/admin/quotations"
+                class="inline-flex items-center gap-1 text-xs font-medium text-blue-500 hover:text-blue-600">
+                    Lihat semua
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                </a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">

@@ -61,8 +61,12 @@
                 <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
                     Total Harga Penawaran (Rp) <span class="text-red-500">*</span>
                 </label>
-                <input id="quotPrice" type="number" min="0" placeholder="Contoh: 15000000"
-                    class="w-full px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white">
+               <input id="quotPrice"
+                type="text"
+                inputmode="numeric"
+                placeholder="Contoh: 15.000.000"
+                autocomplete="off"
+                class="w-full px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white">
             </div>
         </div>
 
@@ -170,16 +174,6 @@ async function loadInvitations() {
     try {
         const res  = await fetch('/api/supplier/rfq', { headers: { 'Accept': 'application/json' } });
         const json = await res.json();
-
-        /*
-         * Filter invitation yang boleh muncul di dropdown:
-         * 1. can_submit === true   → artinya backend sudah validasi: batch open, deadline belum lewat,
-         *    tidak ada pending/submitted aktif, dan status invitation 'invited'
-         *    (termasuk winner yang batch-nya di-reopen)
-         *
-         * TIDAK perlu cek deadline di sini karena can_submit sudah meng-cover semua kondisi.
-         * Invitation dengan deadline lewat → can_submit = false → tidak masuk dropdown.
-         */
         allInvitations = (json.invitations || []).filter(inv => inv.can_submit === true);
         populateInviteSelect();
     } catch(e) {}
@@ -192,14 +186,14 @@ function populateInviteSelect() {
     sel.innerHTML = '<option value="">-- Pilih undangan RFQ --</option>';
 
     if (!allInvitations.length) {
-        // Tidak ada undangan yang bisa disubmit → tampilkan info, sembunyikan form fields
+        // Tidak ada undangan yang bisa disubmit -> tampilkan info, sembunyikan form fields
         noInvEl.classList.remove('hidden');
         sel.closest('.grid').classList.add('hidden');
         document.getElementById('btnSubmit').classList.add('hidden');
         return;
     }
 
-    // Ada undangan → pastikan form visible
+    // Ada undangan -> pastikan form visible
     noInvEl.classList.add('hidden');
     sel.closest('.grid').classList.remove('hidden');
     document.getElementById('btnSubmit').classList.remove('hidden');
@@ -218,7 +212,7 @@ function populateInviteSelect() {
 async function submitQuotation() {
     const invId = document.getElementById('inviteSelect').value;
     const file  = document.getElementById('quotFile').files[0];
-    const price = document.getElementById('quotPrice').value;
+    const price = document.getElementById('quotPrice').value.replace(/\./g, '');
 
     if (!invId)  { showFormAlert('Pilih undangan RFQ terlebih dahulu.'); return; }
     if (!file)   { showFormAlert('Upload file Excel penawaran.'); return; }
@@ -332,6 +326,18 @@ function doFilter() {
     const s = document.getElementById('statusFilter').value;
     renderTable(s ? allQuotations.filter(q => q.status === s) : allQuotations);
 }
+
+const quotPriceInput = document.getElementById('quotPrice');
+
+quotPriceInput.addEventListener('input', function () {
+    // Ambil hanya angka
+    let value = this.value.replace(/\D/g, '');
+
+    // Format ribuan Indonesia
+    this.value = value
+        ? parseInt(value, 10).toLocaleString('id-ID')
+        : '';
+});
 
 // Init
 loadTemplates();

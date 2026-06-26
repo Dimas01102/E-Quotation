@@ -35,6 +35,27 @@
 
         <!-- Table -->
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+            <!-- Filter -->
+            <div class="flex flex-col md:flex-row gap-3 p-4 border-b border-gray-100 dark:border-gray-800">
+                <div class="relative flex-1 max-w-xs">
+                    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input id="searchInput" type="text" placeholder="Cari judul, nomor RFQ..."
+                        class="w-full pl-9 pr-4 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white"
+                        oninput="doFilter()">
+                </div>
+                <select id="statusFilter" onchange="doFilter()"
+                    class="text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white">
+                    <option value="">Semua Status</option>
+                    <option value="draft">Draft</option>
+                    <option value="open">Open</option>
+                    <option value="closed">Closed</option>
+                </select>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 dark:bg-gray-800/60">
@@ -55,6 +76,9 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination Component -->
+            <x-pagination id="paginasiBatch" />
         </div>
     </div>
 
@@ -137,7 +161,10 @@
 
     <script>
         let allBatches = [];
+        let filteredBatches = [];
         let delId = null;
+
+        const PAGINATION_ID = 'paginasiBatch';
 
         const statusCls = {
             draft: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
@@ -146,27 +173,21 @@
         };
 
         function capitalize(str) {
-            if (!str) return '—';
-            return str.charAt(0).toUpperCase() + str.slice(1);
+            return str ? str.charAt(0).toUpperCase() + str.slice(1) : '—';
         }
 
-        // Jika status deadline sudah lewat, merubah status open menjadi closed
         function getEffectiveStatus(b) {
             if (b.status === 'open' && b.deadline) {
-                const deadline = new Date(b.deadline);
-                deadline.setHours(23, 59, 59, 999); // akhir hari deadline
-                if (deadline < new Date()) return 'closed';
+                const dl = new Date(b.deadline);
+                dl.setHours(23, 59, 59, 999);
+                if (dl < new Date()) return 'closed';
             }
             return b.status;
         }
 
-        // Timezone-safe pakai waktu lokal browser
         function getTodayStr() {
             const d = new Date();
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${y}-${m}-${day}`;
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         }
 
         function showModal(id) {
@@ -179,32 +200,22 @@
             document.getElementById(id).style.display = 'none';
         }
 
-        function CSRF() {
-            return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-        }
-
-        function fmtDate(val) {
-            if (!val) return '—';
-            const d = new Date(val);
-            if (isNaN(d)) return val;
-            return d.toLocaleDateString('id-ID', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            });
-        }
-
-        function fmtRp(val) {
-            if (val === null || val === undefined || val === '') return '—';
-            return 'Rp ' + Number(val).toLocaleString('id-ID');
-        }
-
         function closeModalBatch() {
             hideModal('modalBatch');
         }
 
         function closeDel() {
             hideModal('modalDel');
+        }
+
+        function fmtDate(val) {
+            if (!val) return '—';
+            const d = new Date(val);
+            return isNaN(d) ? val : d.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
         }
 
         async function loadBatches() {
@@ -219,55 +230,82 @@
                 allBatches = json.batches || [];
 
                 document.getElementById('stTotal').textContent = allBatches.length;
-                document.getElementById('stDraft').textContent = allBatches.filter(b => getEffectiveStatus(b) === 'draft').length;
-                document.getElementById('stOpen').textContent = allBatches.filter(b => getEffectiveStatus(b) === 'open').length;
+                document.getElementById('stDraft').textContent = allBatches.filter(b => getEffectiveStatus(b) ===
+                    'draft').length;
+                document.getElementById('stOpen').textContent = allBatches.filter(b => getEffectiveStatus(b) === 'open')
+                    .length;
 
-                renderTable(allBatches);
+                filteredBatches = allBatches;
+                Pagination.init(PAGINATION_ID, filteredBatches.length, 10, renderPage);
+                renderPage(1, 10);
             } catch (e) {
                 document.getElementById('batchTable').innerHTML =
                     `<tr><td colspan="7" class="px-5 py-6 text-center text-sm text-red-400">Gagal memuat: ${e.message}</td></tr>`;
             }
         }
 
-        function renderTable(list) {
+        function renderPage(page, perPage) {
+            const start = (page - 1) * perPage;
+            renderTable(filteredBatches.slice(start, start + perPage), start);
+        }
+
+        function renderTable(list, offset = 0) {
             const tb = document.getElementById('batchTable');
             if (!list.length) {
                 tb.innerHTML =
                     '<tr><td colspan="7" class="px-5 py-6 text-center text-sm text-gray-400">Belum ada batch RFQ.</td></tr>';
                 return;
             }
-            tb.innerHTML = list.map((b, i) => `
-    <tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
-        <td class="px-5 py-3.5 text-xs text-gray-400">${i+1}</td>
-        <td class="px-5 py-3.5">
-            <a href="/admin/batches/${b.id_batch}" class="font-mono text-sm font-bold text-blue-600 hover:underline">${b.batch_number}</a>
-        </td>
-        <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-white text-sm">${b.title}</td>
-        <td class="px-5 py-3.5 text-sm ${b.deadline && new Date(b.deadline) < new Date() ? 'text-red-500 font-medium' : 'text-gray-500'}">${fmtDate(b.deadline)}</td>
-        <td class="px-5 py-3.5">
-            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusCls[getEffectiveStatus(b)] || 'bg-gray-100 text-gray-600'}">${capitalize(getEffectiveStatus(b))}</span>
-        </td>
-        <td class="px-5 py-3.5 text-xs text-gray-500">${fmtDate(b.created_at)}</td>
-        <td class="px-5 py-3.5 text-right">
-            <div class="flex items-center justify-end gap-2">
-                <a href="/admin/batches/${b.id_batch}"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 text-blue-600 rounded-lg text-xs font-medium transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    Detail
-                </a>
-                <button onclick="openEdit(${b.id_batch})"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 text-amber-600 rounded-lg text-xs font-medium transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                    Edit
-                </button>
-                <button onclick="askDel(${b.id_batch})"
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 rounded-lg text-xs font-medium transition-colors">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                    Hapus
-                </button>
-            </div>
-        </td>
-    </tr>`).join('');
+            tb.innerHTML = list.map((b, i) => {
+                const eff = getEffectiveStatus(b);
+                return `
+<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
+    <td class="px-5 py-3.5 text-xs text-gray-400">${offset + i + 1}</td>
+    <td class="px-5 py-3.5">
+        <a href="/admin/batches/${b.id_batch}" class="font-mono text-sm font-bold text-blue-600 hover:underline">${b.batch_number}</a>
+    </td>
+    <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-white text-sm">${b.title}</td>
+    <td class="px-5 py-3.5 text-sm ${b.deadline && new Date(b.deadline) < new Date() ? 'text-red-500 font-medium' : 'text-gray-500'}">${fmtDate(b.deadline)}</td>
+    <td class="px-5 py-3.5">
+        <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusCls[eff] || 'bg-gray-100 text-gray-600'}">${capitalize(eff)}</span>
+    </td>
+    <td class="px-5 py-3.5 text-xs text-gray-500">${fmtDate(b.created_at)}</td>
+    <td class="px-5 py-3.5 text-right">
+        <div class="flex items-center justify-end gap-2">
+            <a href="/admin/batches/${b.id_batch}"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 text-blue-600 rounded-lg text-xs font-medium transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                Detail
+            </a>
+            <button onclick="openEdit(${b.id_batch})"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 text-amber-600 rounded-lg text-xs font-medium transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Edit
+            </button>
+            <button onclick="askDel(${b.id_batch})"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 rounded-lg text-xs font-medium transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                Hapus
+            </button>
+        </div>
+    </td>
+</tr>`;
+            }).join('');
+        }
+
+        function doFilter() {
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            const status = document.getElementById('statusFilter').value;
+            filteredBatches = allBatches.filter(b => {
+                const eff = getEffectiveStatus(b);
+                const matchStatus = !status || eff === status;
+                const matchQ = !q ||
+                    b.title.toLowerCase().includes(q) ||
+                    b.batch_number.toLowerCase().includes(q);
+                return matchStatus && matchQ;
+            });
+            Pagination.update(PAGINATION_ID, filteredBatches.length);
+            renderPage(Pagination.currentPage(PAGINATION_ID), Pagination.currentPerPage(PAGINATION_ID));
         }
 
         function openAddBatch() {
@@ -302,31 +340,24 @@
             const title = document.getElementById('batchTitle').value.trim();
             const deadline = document.getElementById('batchDeadline').value;
             const desc = document.getElementById('batchDesc').value.trim();
-
             if (!title || !deadline) {
                 showAlertBatch('Judul dan deadline wajib.');
                 return;
             }
-
-            // Validasi client-side timezone-safe
             if (deadline < getTodayStr()) {
                 showAlertBatch('Deadline tidak boleh tanggal yang sudah lewat.');
                 return;
             }
-
             const body = {
                 title,
                 description: desc,
                 deadline
             };
             if (id) body.status = document.getElementById('batchStatus').value;
-
             const url = id ? `/api/admin/batches/${id}` : '/api/admin/batches';
-            const method = id ? 'PUT' : 'POST';
-
             try {
                 const res = await fetch(url, {
-                    method,
+                    method: id ? 'PUT' : 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
@@ -336,10 +367,8 @@
                 });
                 const json = await res.json();
                 if (!res.ok || !json.success) {
-                    const errMsg = json.errors ?
-                        Object.values(json.errors).flat().join(' ') :
-                        (json.message || 'Gagal.');
-                    showAlertBatch(errMsg);
+                    showAlertBatch(json.errors ? Object.values(json.errors).flat().join(' ') : (json.message ||
+                        'Gagal.'));
                     return;
                 }
                 closeModalBatch();
@@ -383,16 +412,14 @@
 
         function toast(msg, type = 'success') {
             const t = document.createElement('div');
-            t.className = `fixed bottom-5 right-5 px-5 py-3 rounded-xl text-white text-sm z-[9999] shadow-lg ${
-            type === 'success' ? 'bg-green-600' : 'bg-red-600'
-        }`;
+            t.className =
+                `fixed bottom-5 right-5 px-5 py-3 rounded-xl text-white text-sm z-[9999] shadow-lg ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
             t.textContent = msg;
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
 
-        // Blokir input manual tanggal lampau via event listener
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('batchDeadline').addEventListener('change', function() {
                 if (this.value && this.value < getTodayStr()) {
                     this.value = '';

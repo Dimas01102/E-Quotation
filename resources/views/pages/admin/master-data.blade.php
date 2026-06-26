@@ -54,29 +54,25 @@
                     <table class="w-full text-sm text-left border-collapse">
                         <thead class="bg-gray-50 dark:bg-gray-800/60 border-b border-gray-200 dark:border-gray-800">
                             <tr>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500  tracking-wider w-16">#
-                                </th>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500  tracking-wider min-w-[150px]">
-                                    Nama Kategori</th>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500  tracking-wider min-w-[200px]">
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider w-16">#</th>
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[150px]">Nama
+                                    Kategori</th>
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[200px]">
                                     Deskripsi</th>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500  tracking-wider">Jml Item
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider">Jml Item</th>
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider text-right">Aksi
                                 </th>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500  tracking-wider text-right">
-                                    Aksi</th>
                             </tr>
                         </thead>
                         <tbody id="catBody" class="divide-y divide-gray-200 dark:divide-gray-800">
                             <tr>
-                                <td colspan="5" class="px-5 py-10 text-center text-gray-400">
-                                    <div class="flex flex-col items-center gap-2">
-                                        <span class="animate-pulse">Memuat data...</span>
-                                    </div>
-                                </td>
+                                <td colspan="5" class="px-5 py-10 text-center text-gray-400"><span
+                                        class="animate-pulse">Memuat data...</span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                <x-pagination id="paginasiKat" />
             </div>
         </div>
 
@@ -88,39 +84,28 @@
                     <table class="w-full text-sm text-left border-collapse">
                         <thead class="bg-gray-50 dark:bg-gray-800/60 border-b border-gray-200 dark:border-gray-800">
                             <tr>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider w-12">#
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider w-12">#</th>
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[100px]">Kode
                                 </th>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[100px]">
-                                    Kode</th>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[200px]">
-                                    Nama Item</th>
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[200px]">Nama
+                                    Item</th>
                                 <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[120px]">
                                     Kategori</th>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[80px]">
-                                    Satuan</th>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider text-right">
-                                    Aksi</th>
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[80px]">Satuan
+                                </th>
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider text-right">Aksi
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="itemBody" class="divide-y divide-gray-100 dark:divide-gray-800">
                             <tr>
-                                <td colspan="6" class="px-5 py-10 text-center text-gray-400">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <svg class="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg"
-                                            fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10"
-                                                stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor"
-                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                            </path>
-                                        </svg>
-                                        <span>Memuat data item...</span>
-                                    </div>
-                                </td>
+                                <td colspan="6" class="px-5 py-10 text-center text-gray-400"><span
+                                        class="animate-pulse">Memuat data item...</span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                <x-pagination id="paginasiItem" />
             </div>
         </div>
 
@@ -132,44 +117,28 @@
                     <table class="w-full text-sm text-left border-collapse">
                         <thead class="bg-gray-50 dark:bg-gray-800/60 border-b border-gray-200 dark:border-gray-800">
                             <tr>
-                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider w-12">#
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider w-12">#</th>
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[200px]">Judul
+                                    Template</th>
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[150px]">File
                                 </th>
-                                <th
-                                    class="px-5 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[200px]">
-                                    Judul Template</th>
-                                <th
-                                    class="px-5 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[150px]">
-                                    File</th>
-                                <th
-                                    class="px-5 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[100px]">
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[100px]">
                                     Status</th>
-                                <th
-                                    class="px-5 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider min-w-[130px]">
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider min-w-[130px]">
                                     Diupload</th>
-                                <th
-                                    class="px-5 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">
-                                    Aksi</th>
+                                <th class="px-5 py-4 text-xs font-semibold text-gray-500 tracking-wider text-right">Aksi
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="tplBody" class="divide-y divide-gray-100 dark:divide-gray-800">
                             <tr>
-                                <td colspan="6" class="px-5 py-10 text-center text-gray-400">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <svg class="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg"
-                                            fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10"
-                                                stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor"
-                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                            </path>
-                                        </svg>
-                                        <span class="font-medium">Memuat data template...</span>
-                                    </div>
-                                </td>
+                                <td colspan="6" class="px-5 py-10 text-center text-gray-400"><span
+                                        class="animate-pulse">Memuat data template...</span></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                <x-pagination id="paginasiTpl" />
             </div>
         </div>
     </div>
@@ -348,6 +317,9 @@
         let allCats = [],
             allItems = [],
             allTpls = [];
+        let filteredCats = [],
+            filteredItems = [],
+            filteredTpls = [];
         let delId = null,
             delType = null,
             activeTab = 'cat';
@@ -356,23 +328,22 @@
         function switchTab(tab) {
             activeTab = tab;
             ['cat', 'item', 'tpl'].forEach(t => {
-                document.getElementById('pane' + t.charAt(0).toUpperCase() + t.slice(1)).style.display = t === tab ?
-                    '' : 'none';
+                const key = t.charAt(0).toUpperCase() + t.slice(1);
+                document.getElementById('pane' + key).style.display = t === tab ? '' : 'none';
             });
-            const a =
+            const active =
                 'px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white dark:bg-gray-700 text-gray-800 dark:text-white shadow-sm';
-            const i =
+            const inactive =
                 'px-4 py-2 rounded-lg text-sm font-medium transition-all text-gray-500 hover:text-gray-700 dark:text-gray-400';
-            document.getElementById('tabCat').className = tab === 'cat' ? a : i;
-            document.getElementById('tabItem').className = tab === 'item' ? a : i;
-            document.getElementById('tabTpl').className = tab === 'tpl' ? a : i;
+            document.getElementById('tabCat').className = tab === 'cat' ? active : inactive;
+            document.getElementById('tabItem').className = tab === 'item' ? active : inactive;
+            document.getElementById('tabTpl').className = tab === 'tpl' ? active : inactive;
             document.getElementById('catItemFilter').style.display = tab === 'item' ? '' : 'none';
-            const labels = {
+            document.getElementById('btnAddLabel').textContent = {
                 cat: 'Tambah Kategori',
                 item: 'Tambah Item',
                 tpl: 'Upload Template'
-            };
-            document.getElementById('btnAddLabel').textContent = labels[tab];
+            } [tab];
             document.getElementById('searchInput').value = '';
         }
 
@@ -382,7 +353,6 @@
             else openAddTpl();
         }
 
-        // ─── Modal helpers ────────────────────────────────────────────────────
         function showModal(id) {
             const el = document.getElementById(id);
             el.style.removeProperty('display');
@@ -455,24 +425,32 @@
             });
             const json = await res.json();
             allCats = json.categories || [];
-            renderCats(allCats);
+            filteredCats = allCats;
+            Pagination.init('paginasiKat', filteredCats.length, 10, (page, perPage) => renderCatsPage(page, perPage));
+            renderCatsPage(1, 10);
             populateCatSelects();
         }
 
-        function renderCats(list) {
+        function renderCatsPage(page, perPage) {
+            const start = (page - 1) * perPage;
+            renderCats(filteredCats.slice(start, start + perPage), start);
+        }
+
+        function renderCats(list, offset = 0) {
             const tb = document.getElementById('catBody');
             if (!list.length) {
                 tb.innerHTML =
                     '<tr><td colspan="5" class="px-5 py-6 text-center text-sm text-gray-400">Belum ada kategori.</td></tr>';
                 return;
             }
-            tb.innerHTML = list.map((c, i) => `<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
-        <td class="px-5 py-3.5 text-xs text-gray-400">${i+1}</td>
-        <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-white">${c.name}</td>
-        <td class="px-5 py-3.5 text-sm text-gray-500">${c.description || '—'}</td>
-        <td class="px-5 py-3.5"><span class="px-2.5 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-xs">${c.items_count ?? 0} item</span></td>
-        <td class="px-5 py-3.5 text-right">${actionBtns(c.id_master_category, 'cat')}</td>
-    </tr>`).join('');
+            tb.innerHTML = list.map((c, i) => `
+<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
+    <td class="px-5 py-3.5 text-xs text-gray-400">${offset + i + 1}</td>
+    <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-white">${c.name}</td>
+    <td class="px-5 py-3.5 text-sm text-gray-500">${c.description || '—'}</td>
+    <td class="px-5 py-3.5"><span class="px-2.5 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-xs">${c.items_count ?? 0} item</span></td>
+    <td class="px-5 py-3.5 text-right">${actionBtns(c.id_master_category, 'cat')}</td>
+</tr>`).join('');
         }
 
         // ─── ITEM ─────────────────────────────────────────────────────────────
@@ -542,24 +520,33 @@
             });
             const json = await res.json();
             allItems = json.items || [];
-            renderItems(allItems);
+            filteredItems = allItems;
+            Pagination.init('paginasiItem', filteredItems.length, 10, (page, perPage) => renderItemsPage(page,
+                perPage));
+            renderItemsPage(1, 10);
         }
 
-        function renderItems(list) {
+        function renderItemsPage(page, perPage) {
+            const start = (page - 1) * perPage;
+            renderItems(filteredItems.slice(start, start + perPage), start);
+        }
+
+        function renderItems(list, offset = 0) {
             const tb = document.getElementById('itemBody');
             if (!list.length) {
                 tb.innerHTML =
                     '<tr><td colspan="6" class="px-5 py-6 text-center text-sm text-gray-400">Belum ada item.</td></tr>';
                 return;
             }
-            tb.innerHTML = list.map((item, i) => `<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
-        <td class="px-5 py-3.5 text-xs text-gray-400">${i+1}</td>
-        <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded text-xs font-mono">${item.item_code}</span></td>
-        <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-white">${item.item_name}</td>
-        <td class="px-5 py-3.5"><span class="px-2.5 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-xs">${item.category?.name || '—'}</span></td>
-        <td class="px-5 py-3.5 text-sm text-gray-500">${item.unit}</td>
-        <td class="px-5 py-3.5 text-right">${actionBtns(item.id_item, 'item')}</td>
-    </tr>`).join('');
+            tb.innerHTML = list.map((item, i) => `
+<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
+    <td class="px-5 py-3.5 text-xs text-gray-400">${offset + i + 1}</td>
+    <td class="px-5 py-3.5"><span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded text-xs font-mono">${item.item_code}</span></td>
+    <td class="px-5 py-3.5 font-medium text-gray-800 dark:text-white">${item.item_name}</td>
+    <td class="px-5 py-3.5"><span class="px-2.5 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-xs">${item.category?.name || '—'}</span></td>
+    <td class="px-5 py-3.5 text-sm text-gray-500">${item.unit}</td>
+    <td class="px-5 py-3.5 text-right">${actionBtns(item.id_item, 'item')}</td>
+</tr>`).join('');
         }
 
         function populateCatSelects() {
@@ -573,8 +560,12 @@
         function filterItems() {
             const catId = document.getElementById('catItemFilter').value;
             const q = document.getElementById('searchInput').value.toLowerCase();
-            renderItems(allItems.filter(item => (!catId || String(item.id_category) === catId) && (!q || item.item_name
-                .toLowerCase().includes(q) || item.item_code.toLowerCase().includes(q))));
+            filteredItems = allItems.filter(item =>
+                (!catId || String(item.id_category) === catId) &&
+                (!q || item.item_name.toLowerCase().includes(q) || item.item_code.toLowerCase().includes(q))
+            );
+            Pagination.update('paginasiItem', filteredItems.length);
+            renderItemsPage(Pagination.currentPage('paginasiItem'), Pagination.currentPerPage('paginasiItem'));
         }
 
         // ─── TEMPLATE EXCEL ───────────────────────────────────────────────────
@@ -612,7 +603,6 @@
             const desc = document.getElementById('tplDesc').value.trim();
             const file = document.getElementById('tplFile').files[0];
             const active = document.getElementById('tplActive').checked;
-
             if (!title) {
                 setAlert('alertTpl', 'Judul wajib diisi.');
                 return;
@@ -621,14 +611,12 @@
                 setAlert('alertTpl', 'File Excel wajib diupload.');
                 return;
             }
-
             const fd = new FormData();
             fd.append('title', title);
             fd.append('description', desc);
             fd.append('is_active', active ? '1' : '0');
             if (file) fd.append('file', file);
-            if (id) fd.append('_method', 'POST'); // Override untuk edit
-
+            if (id) fd.append('_method', 'POST');
             const url = id ? `/api/admin/rfq-templates/${id}` : '/api/admin/rfq-templates';
             try {
                 const res = await fetch(url, {
@@ -659,36 +647,44 @@
             });
             const json = await res.json();
             allTpls = json.templates || [];
-            renderTpls(allTpls);
+            filteredTpls = allTpls;
+            Pagination.init('paginasiTpl', filteredTpls.length, 10, (page, perPage) => renderTplsPage(page, perPage));
+            renderTplsPage(1, 10);
         }
 
-        function renderTpls(list) {
+        function renderTplsPage(page, perPage) {
+            const start = (page - 1) * perPage;
+            renderTpls(filteredTpls.slice(start, start + perPage), start);
+        }
+
+        function renderTpls(list, offset = 0) {
             const tb = document.getElementById('tplBody');
             if (!list.length) {
                 tb.innerHTML =
                     '<tr><td colspan="6" class="px-5 py-6 text-center text-sm text-gray-400">Belum ada template.</td></tr>';
                 return;
             }
-            tb.innerHTML = list.map((t, i) => `<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
-        <td class="px-5 py-3.5 text-xs text-gray-400">${i+1}</td>
-        <td class="px-5 py-3.5">
-            <p class="font-medium text-gray-800 dark:text-white text-sm">${t.title}</p>
-            <p class="text-xs text-gray-400 mt-0.5">${t.description || ''}</p>
-        </td>
-        <td class="px-5 py-3.5">
-            <a href="${t.file_url}" target="_blank" class="inline-flex items-center gap-1 text-blue-600 hover:underline text-xs">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a2 2 0 002 2h14a2 2 0 002-2v-3"/></svg>
-                ${t.file_name}
-            </a>
-        </td>
-        <td class="px-5 py-3.5">
-            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${t.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500'}">
-                ${t.is_active ? 'Aktif' : 'Nonaktif'}
-            </span>
-        </td>
-        <td class="px-5 py-3.5 text-xs text-gray-400">${t.created_at ? new Date(t.created_at).toLocaleDateString('id-ID') : '—'} · ${t.uploaded_by || '—'}</td>
-        <td class="px-5 py-3.5 text-right">${actionBtns(t.id, 'tpl')}</td>
-    </tr>`).join('');
+            tb.innerHTML = list.map((t, i) => `
+<tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
+    <td class="px-5 py-3.5 text-xs text-gray-400">${offset + i + 1}</td>
+    <td class="px-5 py-3.5">
+        <p class="font-medium text-gray-800 dark:text-white text-sm">${t.title}</p>
+        <p class="text-xs text-gray-400 mt-0.5">${t.description || ''}</p>
+    </td>
+    <td class="px-5 py-3.5">
+        <a href="${t.file_url}" target="_blank" class="inline-flex items-center gap-1 text-blue-600 hover:underline text-xs">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a2 2 0 002 2h14a2 2 0 002-2v-3"/></svg>
+            ${t.file_name}
+        </a>
+    </td>
+    <td class="px-5 py-3.5">
+        <span class="px-2.5 py-1 rounded-full text-xs font-medium ${t.is_active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500'}">
+            ${t.is_active ? 'Aktif' : 'Nonaktif'}
+        </span>
+    </td>
+    <td class="px-5 py-3.5 text-xs text-gray-400">${t.created_at ? new Date(t.created_at).toLocaleDateString('id-ID') : '—'} · ${t.uploaded_by || '—'}</td>
+    <td class="px-5 py-3.5 text-right">${actionBtns(t.id, 'tpl')}</td>
+</tr>`).join('');
         }
 
         // ─── DELETE ───────────────────────────────────────────────────────────
@@ -724,11 +720,19 @@
         // ─── Search ───────────────────────────────────────────────────────────
         function doSearch() {
             const q = document.getElementById('searchInput').value.toLowerCase();
-            if (activeTab === 'cat') renderCats(allCats.filter(c => c.name.toLowerCase().includes(q) || (c.description ||
-                '').toLowerCase().includes(q)));
-            else if (activeTab === 'item') filterItems();
-            else renderTpls(allTpls.filter(t => t.title.toLowerCase().includes(q) || t.file_name.toLowerCase().includes(
-                q)));
+            if (activeTab === 'cat') {
+                filteredCats = allCats.filter(c => c.name.toLowerCase().includes(q) || (c.description || '').toLowerCase()
+                    .includes(q));
+                Pagination.update('paginasiKat', filteredCats.length);
+                renderCatsPage(Pagination.currentPage('paginasiKat'), Pagination.currentPerPage('paginasiKat'));
+            } else if (activeTab === 'item') {
+                filterItems();
+            } else {
+                filteredTpls = allTpls.filter(t => t.title.toLowerCase().includes(q) || t.file_name.toLowerCase().includes(
+                    q));
+                Pagination.update('paginasiTpl', filteredTpls.length);
+                renderTplsPage(Pagination.currentPage('paginasiTpl'), Pagination.currentPerPage('paginasiTpl'));
+            }
         }
 
         // ─── Helpers ──────────────────────────────────────────────────────────
@@ -736,13 +740,13 @@
             const editFn = type === 'cat' ? `openEditCat(${id})` : type === 'item' ? `openEditItem(${id})` :
                 `openEditTpl(${id})`;
             return `<div class="flex items-center justify-end gap-2">
-        <button onclick="${editFn}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-medium transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Edit
-        </button>
-        <button onclick="askDel(${id},'${type}')" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-xs font-medium transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>Hapus
-        </button>
-    </div>`;
+                <button onclick="${editFn}" class="inline-flex items-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-lg text-xs font-medium transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Edit
+                </button>
+                <button onclick="askDel(${id}, '${type}')" class="inline-flex items-center gap-1 px-3 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-xs font-medium transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>Hapus
+                </button>
+            </div>`;
         }
 
         function setAlert(id, msg) {
@@ -751,8 +755,8 @@
             el.classList.remove('hidden');
         }
 
-        function errMsg(e) {
-            return e ? Object.values(e).flat().join(' ') : 'Kesalahan.';
+        function errMsg(errors) {
+            return errors ? Object.values(errors).flat().join(', ') : 'Validasi gagal.';
         }
 
         function toast(msg, type = 'success') {
@@ -764,9 +768,6 @@
             setTimeout(() => t.remove(), 3000);
         }
 
-        // ─── Init ─────────────────────────────────────────────────────────────
-        loadCats();
-        loadItems();
-        loadTpls();
+        Promise.all([loadCats(), loadItems(), loadTpls()]);
     </script>
 @endsection

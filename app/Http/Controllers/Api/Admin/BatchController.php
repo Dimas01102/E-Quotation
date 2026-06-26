@@ -18,7 +18,7 @@ class BatchController extends Controller
 {
     public function index()
     {
-         // Auto-close batch yang status-nya 'open' ketika deadline sudah lewat
+        // Auto-close batch yang status-nya 'open' ketika deadline sudah lewat
         Batch::where('status', 'open')
             ->whereDate('deadline', '<', now('Asia/Jakarta')->toDateString())
             ->update(['status' => 'closed']);
@@ -83,7 +83,6 @@ class BatchController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Batch RFQ berhasil dibuat.', 'batch' => $batch], 201);
     }
-
     public function update(Request $request, $id)
     {
         $batch = Batch::findOrFail($id);
@@ -91,7 +90,7 @@ class BatchController extends Controller
         $request->validate([
             'title'       => 'sometimes|required|string|max:255',
             'description' => 'nullable|string',
-            'deadline' => 'required|date_format:Y-m-d|after_or_equal:' . now('Asia/Jakarta')->format('Y-m-d'),
+            'deadline'    => 'required|date_format:Y-m-d|after_or_equal:' . now('Asia/Jakarta')->format('Y-m-d'),
             'status'      => 'sometimes|required|in:draft,open,closed',
         ]);
 
@@ -105,7 +104,8 @@ class BatchController extends Controller
 
         if ($reopened) {
             $this->reopenForWinnersOnly($batch->fresh());
-            $this->notifyWinnersOnReopen($batch->fresh(), null);
+            // Tidak ada notifyWinnersOnReopen di sini
+            // Email hanya terkirim kalau admin klik tombol "Kirim Reminder"
         }
 
         return response()->json([
@@ -243,7 +243,7 @@ class BatchController extends Controller
     // ── Send Winner Reminder ──────────────────────────────────────────
     /**
      * Kirim reminder ke supplier pemenang (approved).
-     * Supplier yang rejected TIDAK mendapat reminder — mereka sudah closed.
+     * Supplier yang rejected TIDAK mendapat reminder sudah closed.
      */
     public function sendWinnerReminder(Request $request, $id)
     {
@@ -275,7 +275,7 @@ class BatchController extends Controller
     /**
      * Saat batch di-reopen:
      * - Pemenang (approved) -> status invitation kembali ke 'invited' supaya bisa submit ulang
-     * - Rejected -> TIDAK diubah, tetap closed/rejected
+     * - Rejected -> closed/rejected
      */
     private function reopenForWinnersOnly(Batch $batch): void
     {
@@ -314,12 +314,16 @@ class BatchController extends Controller
 
         if ($approved->isEmpty()) return;
 
-        $mail = new MailService();
+        $mail    = new MailService();
+        $sent    = []; // track email yang sudah dikirim
 
         foreach ($approved as $q) {
             $user     = $q->invitedSupplier?->supplier?->user;
             $supplier = $q->invitedSupplier?->supplier;
             if (!$user || !$supplier) continue;
+
+            if (in_array($user->email, $sent)) continue; // skip kalau sudah dikirim
+            $sent[] = $user->email;
 
             try {
                 $mail->sendWinnerReminder(

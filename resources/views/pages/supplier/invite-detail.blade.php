@@ -124,8 +124,14 @@
                 <button onclick="window.history.back()"
                     class="px-5 py-2.5 text-sm bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-colors">Batal</button>
                 <button id="submit-btn" onclick="submitQuotation()"
-                    class="px-6 py-2.5 text-sm bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-colors shadow-lg shadow-emerald-500/25">Kirim
-                    Penawaran →</button>
+                    class="inline-flex items-center gap-1 px-6 py-2.5 text-sm bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold transition-colors shadow-lg shadow-emerald-500/25">
+                    <span>Kirim Penawaran</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -143,8 +149,13 @@
         <p id="submitted-info" class="text-sm text-gray-500 dark:text-gray-400 mb-3">Penawaran Anda sedang dalam proses
             review. Sistem membandingkan semua penawaran secara otomatis.</p>
         <a href="/supplier/quotations"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-sm font-semibold rounded-xl transition-colors">
-            Lihat Status Penawaran →
+            class="inline-flex items-center gap-1 px-4 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-sm font-semibold rounded-xl transition-colors">
+            <span>Lihat Status Penawaran</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
         </a>
     </div>
 @endsection
@@ -235,14 +246,28 @@
                 document.getElementById('form-error').textContent = 'Total harga wajib diisi dan lebih dari 0.';
                 document.getElementById('form-error').classList.remove('hidden');
                 btn.disabled = false;
-                btn.textContent = 'Kirim Penawaran →';
+                btn.innerHTML = `
+                    <span>Kirim Penawaran</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                `;
                 return;
             }
             if (!file) {
                 document.getElementById('form-error').textContent = 'File penawaran wajib diupload.';
                 document.getElementById('form-error').classList.remove('hidden');
                 btn.disabled = false;
-                btn.textContent = 'Kirim Penawaran →';
+                btn.innerHTML = `
+                    <span>Kirim Penawaran</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
+                `;
                 return;
             }
 
@@ -265,7 +290,14 @@
                 document.getElementById('form-error').classList.remove('hidden');
             }
             btn.disabled = false;
-            btn.textContent = 'Kirim Penawaran →';
+            btn.innerHTML = `
+            <span>Kirim Penawaran</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        `;
         }
 
         loadDetail();

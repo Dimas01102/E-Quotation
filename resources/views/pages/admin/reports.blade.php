@@ -169,7 +169,7 @@
                     ${q.po_file_path ? `<a href="/storage/${q.po_file_path}" target="_blank" class="inline-flex items-center gap-1 text-blue-600 hover:underline text-xs font-medium">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a2 2 0 002 2h14a2 2 0 002-2v-3"/></svg>
                             Download PO
-                        </a>` : '—'}
+                        </a>` : '<span class="text-gray-700 dark:text-gray-300">—</span>'}
                 </td>
             </tr>`).join('') :
                     '<tr><td colspan="6" class="px-5 py-6 text-center text-sm text-gray-400">Belum ada penawaran disetujui.</td></tr>';

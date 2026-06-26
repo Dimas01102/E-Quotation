@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <!-- Filter & Search -->
+        <!-- Filter & Table -->
         <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
             <div class="flex flex-col md:flex-row gap-3 p-4 border-b border-gray-100 dark:border-gray-800">
                 <div class="relative flex-1 max-w-xs">
@@ -93,11 +93,14 @@
                     </thead>
                     <tbody id="supplierTable">
                         <tr>
-                            <td colspan="7" class="px-5 py-8 text-center text-sm text-gray-400">Memuat...</td>
+                            <td colspan="8" class="px-5 py-8 text-center text-sm text-gray-400">Memuat...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination Component -->
+            <x-pagination id="paginasiSupplier" />
         </div>
     </div>
 
@@ -126,8 +129,11 @@
 
     <script>
         let allSuppliers = [];
+        let filteredSuppliers = [];
         let currentId = null;
         let currentActive = null;
+
+        const PAGINATION_ID = 'paginasiSupplier';
 
         async function loadSuppliers() {
             try {
@@ -139,25 +145,32 @@
                 const json = await res.json();
                 allSuppliers = json.suppliers || [];
 
-                // Stats
                 document.getElementById('statTotal').textContent = allSuppliers.length;
                 document.getElementById('statActive').textContent = allSuppliers.filter(s => Number(s.user
                     ?.is_active) === 1).length;
                 document.getElementById('statPending').textContent = allSuppliers.filter(s => Number(s.user
                     ?.is_active) === 0).length;
 
-                renderTable(allSuppliers);
+                filteredSuppliers = allSuppliers;
+                Pagination.init(PAGINATION_ID, filteredSuppliers.length, 10, renderPage);
+                renderPage(1, 10);
             } catch (e) {
                 document.getElementById('supplierTable').innerHTML =
-                    `<tr><td colspan="7" class="px-5 py-6 text-center text-sm text-red-400">Gagal memuat: ${e.message}</td></tr>`;
+                    `<tr><td colspan="8" class="px-5 py-6 text-center text-sm text-red-400">Gagal memuat: ${e.message}</td></tr>`;
             }
         }
 
-        function renderTable(list) {
+        function renderPage(page, perPage) {
+            const start = (page - 1) * perPage;
+            const slice = filteredSuppliers.slice(start, start + perPage);
+            renderTable(slice, start);
+        }
+
+        function renderTable(list, offset = 0) {
             const tbody = document.getElementById('supplierTable');
             if (!list.length) {
                 tbody.innerHTML =
-                    '<tr><td colspan="8" class="px-5 py-6 text-center text-sm text-gray-400">Tidak ada data supplier.</td></tr>';
+                    '<tr><td colspan="8" class="px-5 py-10 text-center text-sm text-gray-400">Tidak ada data supplier.</td></tr>';
                 return;
             }
             tbody.innerHTML = list.map((s, i) => {
@@ -165,18 +178,17 @@
                 const bf = s.business_field || '-';
                 return `
 <tr class="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/30">
-    <td class="px-5 py-3.5 text-xs text-gray-400">${i+1}</td>
+    <td class="px-5 py-3.5 text-xs text-gray-400">${offset + i + 1}</td>
     <td class="px-5 py-3.5">
         <p class="font-medium text-gray-800 dark:text-white text-sm">${s.user?.name || '-'}</p>
         <p class="text-xs text-gray-500 mt-0.5">${s.company_name || '-'}</p>
     </td>
     <td class="px-5 py-3.5 text-sm text-gray-600 dark:text-gray-400">${s.user?.email || '-'}</td>
     <td class="px-5 py-3.5 text-sm text-gray-600 dark:text-gray-400">${s.phone || '-'}</td>
-    <td class="px-5 py-3.5">                                        
+    <td class="px-5 py-3.5">
         ${bf !== '-'
             ? `<span class="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs">${bf}</span>`
-            : `<span class="text-xs text-gray-400">-</span>`
-        }
+            : `<span class="text-xs text-gray-400">-</span>`}
     </td>
     <td class="px-5 py-3.5">
         <span class="px-2.5 py-1 rounded-full text-xs font-medium ${isActive
@@ -190,7 +202,10 @@
         <div class="flex items-center justify-end gap-2">
             <button onclick="showDetail(${s.id})"
                 class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg text-xs font-medium transition-colors">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
                 Detail
             </button>
             <button onclick="quickToggle(${s.id}, ${Number(s.user?.is_active)})"
@@ -209,22 +224,20 @@
 
         function doFilter() {
             const q = document.getElementById('searchInput').value.toLowerCase().trim();
-            const status = document.getElementById('statusFilter').value; // '' | '1' | '0'
+            const status = document.getElementById('statusFilter').value;
 
-            const filtered = allSuppliers.filter(s => {
+            filteredSuppliers = allSuppliers.filter(s => {
                 const isActive = Number(s.user?.is_active);
-                const matchStatus = status === '' ?
-                    true :
-                    Number(status) === isActive;
-
+                const matchStatus = status === '' ? true : Number(status) === isActive;
                 const matchQ = !q ||
                     (s.user?.name || '').toLowerCase().includes(q) ||
                     (s.company_name || '').toLowerCase().includes(q) ||
                     (s.user?.email || '').toLowerCase().includes(q);
-
                 return matchStatus && matchQ;
             });
-            renderTable(filtered);
+
+            Pagination.update(PAGINATION_ID, filteredSuppliers.length);
+            renderPage(Pagination.currentPage(PAGINATION_ID), Pagination.currentPerPage(PAGINATION_ID));
         }
 
         function showDetail(id) {
@@ -234,27 +247,25 @@
             currentActive = Number(s.user?.is_active);
 
             document.getElementById('detailContent').innerHTML = `
-        <div><p class="text-xs text-gray-400 mb-1">Nama PIC</p><p class="font-medium text-gray-800 dark:text-white">${s.user?.name || '-'}</p></div>
-        <div><p class="text-xs text-gray-400 mb-1">Email</p><p class="text-gray-700 dark:text-gray-300">${s.user?.email || '-'}</p></div>
-        <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Nama Perusahaan</p><p class="font-semibold text-gray-800 dark:text-white">${s.company_name || '-'}</p></div>
-        <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Bidang Usaha</p>${s.business_field? `<span class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-medium">${s.business_field}</span>`: `<p class="text-gray-400 text-sm">-</p>`}</div>
-        <div><p class="text-xs text-gray-400 mb-1">Telepon</p><p class="text-gray-700 dark:text-gray-300">${s.phone || '-'}</p></div>
-        <div><p class="text-xs text-gray-400 mb-1">NPWP</p><p class="text-gray-700 dark:text-gray-300">${s.npwp || '-'}</p></div>
-        <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Alamat</p><p class="text-gray-700 dark:text-gray-300">${s.address || '-'}</p></div>
-        <div><p class="text-xs text-gray-400 mb-1">Status</p>
-            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${currentActive === 1
-                ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
-                ${currentActive === 1 ? 'Aktif' : 'Menunggu Aktivasi'}
-            </span>
-        </div>
-        <div><p class="text-xs text-gray-400 mb-1">Tgl Daftar</p><p class="text-gray-700 dark:text-gray-300">${s.created_at ? new Date(s.created_at).toLocaleDateString('id-ID') : '-'}</p></div>
-    `;
+                <div><p class="text-xs text-gray-400 mb-1">Nama PIC</p><p class="font-medium text-gray-800 dark:text-white">${s.user?.name || '-'}</p></div>
+                <div><p class="text-xs text-gray-400 mb-1">Email</p><p class="text-gray-700 dark:text-gray-300">${s.user?.email || '-'}</p></div>
+                <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Nama Perusahaan</p><p class="font-semibold text-gray-800 dark:text-white">${s.company_name || '-'}</p></div>
+                <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Bidang Usaha</p>${s.business_field ? `<span class="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-xs font-medium">${s.business_field}</span>` : `<p class="text-gray-400 text-sm">-</p>`}</div>
+                <div><p class="text-xs text-gray-400 mb-1">Telepon</p><p class="text-gray-700 dark:text-gray-300">${s.phone || '-'}</p></div>
+                <div><p class="text-xs text-gray-400 mb-1">NPWP</p><p class="text-gray-700 dark:text-gray-300">${s.npwp || '-'}</p></div>
+                <div class="col-span-2"><p class="text-xs text-gray-400 mb-1">Alamat</p><p class="text-gray-700 dark:text-gray-300">${s.address || '-'}</p></div>
+                <div><p class="text-xs text-gray-400 mb-1">Status</p>
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium ${currentActive === 1 ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">
+                        ${currentActive === 1 ? 'Aktif' : 'Menunggu Aktivasi'}
+                    </span>
+                </div>
+                <div><p class="text-xs text-gray-400 mb-1">Tgl Daftar</p><p class="text-gray-700 dark:text-gray-300">${s.created_at ? new Date(s.created_at).toLocaleDateString('id-ID') : '-'}</p></div>
+            `;
 
             const btn = document.getElementById('btnToggle');
             btn.textContent = currentActive === 1 ? 'Nonaktifkan' : 'Aktifkan Supplier';
-            btn.className = `flex-1 py-2.5 rounded-xl text-white text-sm font-medium transition-colors ${
-        currentActive === 1 ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
-    }`;
+            btn.className =
+                `flex-1 py-2.5 rounded-xl text-white text-sm font-medium transition-colors ${currentActive === 1 ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`;
 
             document.getElementById('detailModal').style.removeProperty('display');
             document.getElementById('detailModal').style.display = 'flex';
@@ -265,8 +276,7 @@
         }
 
         async function doToggle() {
-            const newStatus = currentActive === 1 ? 0 : 1;
-            await callToggle(currentId, newStatus);
+            await callToggle(currentId, currentActive === 1 ? 0 : 1);
             closeDetail();
         }
 
@@ -285,7 +295,7 @@
                     },
                     body: JSON.stringify({
                         is_active: newStatus
-                    })
+                    }),
                 });
                 const json = await res.json();
                 if (res.ok) {
@@ -301,9 +311,8 @@
 
         function toast(msg, type = 'success') {
             const t = document.createElement('div');
-            t.className = `fixed bottom-5 right-5 px-5 py-3 rounded-xl text-white text-sm z-[9999] shadow-lg ${
-        type === 'success' ? 'bg-green-600' : 'bg-red-600'
-    }`;
+            t.className =
+                `fixed bottom-5 right-5 px-5 py-3 rounded-xl text-white text-sm z-[9999] shadow-lg ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
             t.textContent = msg;
             document.body.appendChild(t);
             setTimeout(() => t.remove(), 3000);

@@ -4,7 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 
 // ── Public ────────────────────────────────────────────────────────────
-Route::get('/', [PageController::class, 'index'])->name('home');
+// Route::get('/', [PageController::class, 'index'])->name('home');
+
+Route::redirect('/', '/login');
 Route::get('/login', [PageController::class, 'login'])->name('login');
 Route::get('/register', [PageController::class, 'register'])->name('register');
 

@@ -227,7 +227,8 @@
                 <button onclick="hideModal('modalCat')" class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
+                    </svg>
+                </button>
             </div>
             <div class="p-6 space-y-4">
                 <div id="alertCat" class="hidden p-3 rounded-xl text-sm bg-red-50 text-red-600 border border-red-100">
@@ -249,40 +250,53 @@
         </div>
     </div>
 
-    {{-- Add Item Modal --}}
+   {{-- Add Item Modal --}}
     <div id="modalItem" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
         style="display:none!important">
-        <div
-            class="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md mx-4 shadow-2xl border border-gray-200 dark:border-gray-700">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-lg mx-4 shadow-2xl border border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-800">
                 <h3 class="font-semibold text-gray-800 dark:text-white">Tambah Item ke Kategori</h3>
-                <button onclick="hideModal('modalItem')" class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button onclick="hideModal('modalItem')" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
+                    </svg>
+                </button>
             </div>
             <div class="p-6 space-y-4">
-                <div id="alertItem" class="hidden p-3 rounded-xl text-sm bg-red-50 text-red-600 border border-red-100">
-                </div>
+                <div id="alertItem" class="hidden p-3 rounded-xl text-sm bg-red-50 text-red-600 border border-red-100"></div>
                 <input type="hidden" id="activeCatId">
-                <div><label class="block text-xs font-medium text-gray-600 mb-1.5">Pilih Item <span
-                            class="text-red-500">*</span></label>
-                    <select id="itemSel"
-                        class="w-full px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white">
-                        <option value="">-- Pilih Item --</option>
-                    </select>
-                </div>
-                <div><label class="block text-xs font-medium text-gray-600 mb-1.5">Quantity <span
-                            class="text-red-500">*</span></label>
-                    <input id="itemQty" type="number" min="1" placeholder="Jumlah"
+                <div class="relative">
+                    <input id="itemSearch" type="text" placeholder="Cari item..."
+                        oninput="filterItemList()"
                         class="w-full px-4 py-2.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white">
                 </div>
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-medium text-gray-600 dark:text-gray-400">
+                        Pilih Item <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="selectAllItems(true)"
+                            class="text-xs text-blue-600 hover:underline font-medium">Pilih Semua</button>
+                        <span class="text-gray-300">|</span>
+                        <button type="button" onclick="selectAllItems(false)"
+                            class="text-xs text-gray-500 hover:underline">Hapus Semua</button>
+                    </div>
+                </div>
+                <div id="itemCheckList"
+                    class="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden max-h-64 overflow-y-auto">
+                    <div class="p-4 text-center text-gray-400 text-sm">Memuat item...</div>
+                </div>
+                <p id="itemSelectedCount" class="text-xs text-blue-600 font-medium"></p>
             </div>
             <div class="px-6 pb-6 flex gap-3">
-                <button onclick="addItem()"
-                    class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium">Tambah</button>
+                <button onclick="addItemBulk()"
+                    class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium">
+                    Tambah Item
+                </button>
                 <button onclick="hideModal('modalItem')"
-                    class="flex-1 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 rounded-xl text-sm">Batal</button>
+                    class="flex-1 py-2.5 border border-gray-200 dark:border-gray-700 text-gray-600 rounded-xl text-sm">
+                    Batal
+                </button>
             </div>
         </div>
     </div>
@@ -300,7 +314,8 @@
                 <button onclick="hideModal('modalInvite')" class="text-gray-400 hover:text-gray-600"><svg class="w-5 h-5"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg></button>
+                    </svg>
+                </button>
             </div>
             <div class="p-6 space-y-4">
                 <div id="alertInvite" class="hidden p-3 rounded-xl text-sm bg-red-50 text-red-600 border border-red-100">
@@ -409,7 +424,7 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 
-    // ✅ Timezone-safe: pakai waktu lokal browser, bukan UTC
+    //Timezone-safe: pakai waktu lokal browser, bukan UTC
     function getTodayStr() {
         const d = new Date();
         const y = d.getFullYear();
@@ -604,7 +619,7 @@
             return;
         }
 
-        // ✅ Validasi client-side timezone-safe
+        // Validasi client-side timezone-safe
         if (deadline < getTodayStr()) {
             setAlert('alertEdit', 'Deadline tidak boleh tanggal yang sudah lewat.');
             return;
@@ -672,41 +687,128 @@
 
     // ─── Item ─────────────────────────────────────────────────────────────
     function openAddItem(catId) {
-        document.getElementById('activeCatId').value = catId;
-        document.getElementById('itemSel').innerHTML = '<option value="">-- Pilih Item --</option>' +
-            allMasterItems.map(i => '<option value="' + i.id_item + '">' + i.item_code + ' — ' + i.item_name + ' (' + i.unit + ')</option>').join('');
-        document.getElementById('itemQty').value = '';
-        document.getElementById('alertItem').classList.add('hidden');
-        showModal('modalItem');
+    document.getElementById('activeCatId').value = catId;
+    document.getElementById('alertItem').classList.add('hidden');
+    document.getElementById('itemSearch').value = '';
+    document.getElementById('itemSelectedCount').textContent = '';
+    renderItemCheckList(allMasterItems);
+    showModal('modalItem');
+}
+
+function renderItemCheckList(items) {
+    const container = document.getElementById('itemCheckList');
+    if (!items.length) {
+        container.innerHTML = '<div class="p-4 text-center text-gray-400 text-sm">Tidak ada item.</div>';
+        return;
+    }
+    container.innerHTML = items.map(i => `
+        <div class="item-chk-row flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-gray-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors"
+             data-search="${(i.item_code + ' ' + i.item_name).toLowerCase()}">
+            <input type="checkbox" class="item-chk w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+                value="${i.id_item}" onchange="updateItemCount(); toggleQtyInput(this)">
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-800 dark:text-white">
+                    <span class="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded mr-1">${i.item_code}</span>
+                    ${i.item_name}
+                </p>
+                <p class="text-xs text-gray-400 mt-0.5">${i.unit}</p>
+            </div>
+            <input type="number" min="1" placeholder="Qty"
+                class="item-qty w-20 px-2.5 py-1.5 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white hidden"
+                data-item-id="${i.id_item}">
+        </div>
+    `).join('');
+}
+
+function toggleQtyInput(checkbox) {
+    const row   = checkbox.closest('.item-chk-row');
+    const input = row.querySelector('.item-qty');
+    if (checkbox.checked) {
+        input.classList.remove('hidden');
+        input.focus();
+        if (!input.value) input.value = 1;
+    } else {
+        input.classList.add('hidden');
+        input.value = '';
+    }
+}
+
+function filterItemList() {
+    const q = document.getElementById('itemSearch').value.toLowerCase();
+    document.querySelectorAll('.item-chk-row').forEach(row => {
+        row.style.display = row.dataset.search.includes(q) ? '' : 'none';
+    });
+}
+
+function selectAllItems(checked) {
+    document.querySelectorAll('.item-chk-row').forEach(row => {
+        if (row.style.display === 'none') return; // skip yang tersembunyi filter
+        const cb = row.querySelector('.item-chk');
+        cb.checked = checked;
+        toggleQtyInput(cb);
+    });
+    updateItemCount();
+}
+
+function updateItemCount() {
+    const count = document.querySelectorAll('.item-chk:checked').length;
+    document.getElementById('itemSelectedCount').textContent = count > 0 ? count + ' item dipilih' : '';
+}
+
+async function addItemBulk() {
+    const catId   = document.getElementById('activeCatId').value;
+    const checked = [...document.querySelectorAll('.item-chk:checked')];
+
+    if (!checked.length) { setAlert('alertItem', 'Pilih minimal 1 item.'); return; }
+
+    // Validasi semua qty terisi
+    for (const cb of checked) {
+        const row = cb.closest('.item-chk-row');
+        const qty = row.querySelector('.item-qty').value;
+        if (!qty || Number(qty) < 1) {
+            setAlert('alertItem', 'Isi quantity untuk semua item yang dipilih.');
+            return;
+        }
     }
 
-    async function addItem() {
-        const catId  = document.getElementById('activeCatId').value;
-        const itemId = document.getElementById('itemSel').value;
-        const qty    = document.getElementById('itemQty').value;
-        if (!itemId || !qty) { setAlert('alertItem', 'Pilih item dan isi quantity.'); return; }
-        const res = await fetch('/api/admin/batches/' + batchId + '/categories/' + catId + '/items', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() },
-            body: JSON.stringify({ id_item: itemId, quantity: qty })
-        });
-        const json = await res.json();
-        if (!res.ok || !json.success) { setAlert('alertItem', json.message || 'Gagal.'); return; }
-        hideModal('modalItem');
-        toast('Item ditambahkan');
-        await loadBatch();
+    document.getElementById('alertItem').classList.add('hidden');
+
+    const results = await Promise.allSettled(
+        checked.map(cb => {
+            const row = cb.closest('.item-chk-row');
+            const qty = row.querySelector('.item-qty').value;
+            return fetch('/api/admin/batches/' + batchId + '/categories/' + catId + '/items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': CSRF()
+                },
+                body: JSON.stringify({ id_item: cb.value, quantity: qty })
+            }).then(r => r.json().then(j => ({ ok: r.ok, ...j })));
+        })
+    );
+
+    let success = 0, fail = 0, failMsgs = [];
+    results.forEach(r => {
+        if (r.status === 'fulfilled' && r.value.success) success++;
+        else {
+            fail++;
+            if (r.value?.message) failMsgs.push(r.value.message);
+        }
+    });
+
+    if (fail > 0 && success === 0) {
+        setAlert('alertItem', failMsgs[0] || 'Gagal menambahkan item.');
+        return;
     }
 
-    async function deleteItem(catId, itemId) {
-        if (!confirm('Hapus item ini?')) return;
-        const res = await fetch('/api/admin/batches/' + batchId + '/categories/' + catId + '/items/' + itemId, {
-            method: 'DELETE',
-            headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF() }
-        });
-        const json = await res.json();
-        if (res.ok && json.success) { toast('Item dihapus'); await loadBatch(); }
-        else toast(json.message || 'Gagal', 'error');
-    }
+    hideModal('modalItem');
+    let msg = success + ' item ditambahkan';
+    if (fail) msg += ', ' + fail + ' gagal';
+    toast(msg, success > 0 ? 'success' : 'error');
+    await loadBatch();
+}
 
     // ─── Invite Supplier ──────────────────────────────────────────────────
     function openInvite() {

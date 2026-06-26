@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 class PageController extends Controller
 {
     // ─── Public ───────────────────────────────────────────────────────
-    public function index()
-    {
-        return view('pages.index');
-    }
+    // public function index()
+    // {
+    //     return view('pages.index');
+    // }
 
     public function login()
     {

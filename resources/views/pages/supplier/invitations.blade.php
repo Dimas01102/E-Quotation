@@ -290,9 +290,27 @@
                     </div>` : ''}
                     <p class="text-xs text-amber-600 dark:text-amber-500 mb-3">Admin meminta Anda mengajukan penawaran baru. Silakan upload file penawaran terbaru di halaman Penawaran Saya.</p>
                     <a href="/supplier/quotations"
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                        Ajukan Penawaran Ulang →
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors">
+                        
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                        </svg>
+
+                        <span class="inline-flex items-center gap-1">
+                            Ajukan Penawaran Ulang
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="w-4 h-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </span>
                     </a>
                 </div>`
 
@@ -313,9 +331,19 @@
                 <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800 text-center">
                     <p class="text-sm text-blue-700 dark:text-blue-400 font-medium">Belum ada penawaran</p>
                     ${canSubmit ? `
-                <a href="/supplier/quotations" class="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors">
-                    Ajukan Penawaran di halaman Penawaran Saya →
-                </a>` : '<p class="text-xs text-blue-500 mt-1">Pengajuan tidak tersedia saat ini.</p>'}
+                    <a href="/supplier/quotations"
+                    class="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-medium transition-colors">
+                        <span>Ajukan Penawaran di halaman Penawaran Saya</span>
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                        class="w-4 h-4"
+                        fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                        </svg>
+                    </a>` : `
+                    <p class="text-xs text-blue-500 mt-1">
+                        Pengajuan tidak tersedia saat ini.
+                    </p>`}
                 </div>`}
         </div>
     `;

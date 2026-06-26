@@ -78,7 +78,14 @@
             <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
                 <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
                     <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Undangan RFQ Terbaru</h3>
-                    <a href="/supplier/rfq" class="text-xs text-blue-500 hover:text-blue-600 font-medium">Lihat semua →</a>
+                    <a href="/supplier/rfq" class="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 font-medium">
+                        Lihat semua
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
                 </div>
                 <div id="recentInv" class="divide-y divide-gray-100 dark:divide-gray-800">
                     <div class="px-5 py-6 text-center text-sm text-gray-400">Memuat...</div>
@@ -89,8 +96,14 @@
             <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800">
                 <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-800">
                     <h3 class="font-semibold text-gray-800 dark:text-white text-sm">Status Penawaran Terbaru</h3>
-                    <a href="/supplier/quotations" class="text-xs text-blue-500 hover:text-blue-600 font-medium">Lihat semua
-                        →</a>
+                    <a href="/supplier/quotations" class="inline-flex items-center gap-1 text-xs text-blue-500 hover:text-blue-600 font-medium">
+                        Lihat semua
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
                 </div>
                 <div id="recentQuot" class="divide-y divide-gray-100 dark:divide-gray-800">
                     <div class="px-5 py-6 text-center text-sm text-gray-400">Memuat...</div>
