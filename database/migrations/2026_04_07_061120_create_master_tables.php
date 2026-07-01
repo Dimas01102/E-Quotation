@@ -25,9 +25,9 @@ return new class extends Migration
             $table->text('description')->nullable();
 
             $table->foreign('id_category')
-                  ->references('id_master_category')
-                  ->on('master_category')
-                  ->onDelete('set null');
+                ->references('id_master_category')
+                ->on('master_category')
+                ->onDelete('set null');
         });
     }
 

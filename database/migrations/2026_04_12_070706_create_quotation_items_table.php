@@ -8,7 +8,7 @@ return new class extends Migration
 {
     /**
      * Tabel untuk menyimpan detail isi file Excel quotation dari supplier.
-     * Relasi: quotation_items.id_quotation → quotations.id_quotation
+     * Relasi: quotation_items.id_quotation -> quotations.id_quotation
      *
      * Kolom sesuai header Excel:
      * Coll No. | RFQ No. | Vendor | No. Item | Material No. | Description |
@@ -45,9 +45,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('id_quotation')
-          ->references('id_quotation')
-          ->on('quotations')
-          ->onDelete('cascade');
+                ->references('id_quotation')
+                ->on('quotations')
+                ->onDelete('cascade');
         });
     }
 

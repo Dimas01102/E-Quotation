@@ -9,7 +9,7 @@ class ItemBatchCategory extends Model
     protected $table      = 'items_batch_categories';
     protected $primaryKey = 'id_item_batch_category';
 
-    // ✅ FIX: tabel items_batch_categories TIDAK punya timestamps
+    // tabel items_batch_categories tidak punya timestamps
     public $timestamps = false;
 
     protected $fillable = ['id_item', 'id_batch_category', 'quantity'];

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class SupplierProfileController extends Controller
 {
@@ -38,8 +39,8 @@ class SupplierProfileController extends Controller
         $rules = [
             'name'           => 'required|string|max:255',
             'company_name'   => 'required|string|max:255',
-            'phone'          => 'required|string|max:20',
-            'npwp'           => 'nullable|string|max:30',
+            'phone'          => ['required', 'string', 'max:20', Rule::unique('suppliers', 'phone')->ignore($supplier->id)],
+            'npwp'           => ['nullable', 'string', 'max:30', Rule::unique('suppliers', 'npwp')->ignore($supplier->id)],
             'address'        => 'nullable|string',
             'business_field' => 'nullable|string|max:150', 
         ];
@@ -48,7 +49,10 @@ class SupplierProfileController extends Controller
             $rules['password'] = 'required|string|min:8';
         }
 
-        $request->validate($rules);
+        $request->validate($rules, [
+            'phone.unique' => 'Nomor HP sudah digunakan oleh akun lain.',
+            'npwp.unique'  => 'NPWP sudah terdaftar atas supplier lain.',
+        ]);
 
         // Update nama (dan password jika diisi)
         $userUpdate = ['name' => $request->name];

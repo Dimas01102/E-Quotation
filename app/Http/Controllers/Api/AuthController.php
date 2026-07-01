@@ -84,11 +84,13 @@ class AuthController extends Controller
             'email'        => 'required|email|max:100|unique:users,email',
             'password'     => 'required|string|min:8|confirmed',
             'company_name' => 'required|string|max:150',
-            'phone'        => 'required|string|max:50',
+            'phone'        => 'required|string|max:50|unique:suppliers,phone',
             'address'      => 'nullable|string',
-            'npwp'         => 'nullable|string|max:50',
+            'npwp'         => 'nullable|string|max:50|unique:suppliers,npwp',
         ], [
             'email.unique'       => 'Email sudah terdaftar.',
+            'phone.unique'       => 'Nomor HP sudah digunakan oleh akun lain.',
+            'npwp.unique'        => 'NPWP sudah terdaftar atas supplier lain.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 

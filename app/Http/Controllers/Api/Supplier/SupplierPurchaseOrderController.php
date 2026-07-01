@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class SupplierPurchaseOrderController extends Controller
 {
-    // ─── LIST semua PO milik supplier (quotation approved + po_file_path) ─
+    // List all PO mil supplier (quotation approved + po_file_path)
     public function index()
     {
         $user     = Auth::user();

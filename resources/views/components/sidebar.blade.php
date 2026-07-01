@@ -16,13 +16,11 @@
     $ni     = fn(bool $on) => $on ? $active : $normal;
 @endphp
 
-{{-- ── Overlay (mobile) ──────────────────────────────────────────── --}}
+{{--(mobile) --}}
 <div id="sidebarOverlay"
      class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
 
-{{-- ══════════════════════════════════════════════════════════════════
-     SIDEBAR
-══════════════════════════════════════════════════════════════════ --}}
+{{--  SIDEBAR --}}
 <aside id="{{ $sidebarId }}"
     class="fixed inset-y-0 left-0 z-50 flex flex-col
            bg-white dark:bg-gray-900
@@ -32,7 +30,7 @@
            transition-all duration-300"
     style="width: 16rem;">
 
-    {{-- ── Logo ──────────────────────────────────────────────────────── --}}
+    {{--  Logo --}}
     <div class="flex h-16 flex-shrink-0 items-center gap-3 px-1
                 border-b border-gray-100 dark:border-gray-800">
 
@@ -69,11 +67,11 @@
 
     </div>
 
-    {{-- ── Nav ────────────────────────────────────────────────────────── --}}
+    {{--  Nav --}}
     <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden py-4" id="sidebarNav">
 
         @if ($isAdmin)
-            {{-- ════ ADMIN NAV ════ --}}
+            {{-- ADMIN NAV  --}}
             <a href="/admin/dashboard" data-path="dashboard" title="Dashboard"
                 class="nav-link group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium
                        transition-all text-gray-600 dark:text-gray-400
@@ -159,7 +157,7 @@
             </a>
 
         @else
-            {{-- ════ SUPPLIER NAV ════ --}}
+            {{-- SUPPLIER NAV  --}}
             <p id="navSectionLabel"
                class="mt-1 mb-1 px-3 text-xs font-bold uppercase tracking-widest
                       text-gray-400 dark:text-gray-500 whitespace-nowrap overflow-hidden"
@@ -230,7 +228,7 @@
 
     </nav>
 
-    {{-- ── Footer ─────────────────────────────────────────────────────── --}}
+    {{--  Footer--}}
     <div id="sidebarFooter"
          class="p-4 border-t border-gray-100 dark:border-gray-800 flex-shrink-0 overflow-hidden">
         <p id="sidebarFooterText"

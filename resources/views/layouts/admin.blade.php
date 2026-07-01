@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('page-title', 'Admin') — E-Quotation</title>
+    <title>@yield('page-title', 'Admin') - E-Quotation</title>
     <link rel="icon" type="image/png" href="/assets/images/logo.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -19,7 +19,7 @@
 
     <div class="flex min-h-screen">
 
-        {{-- ── Sidebar ─────────────────────────────────────────────────── --}}
+        {{-- Sidebar --}}
         <x-sidebar type="admin" />
 
         {{-- Overlay untuk mobile --}}
@@ -27,7 +27,7 @@
         <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
 
 
-        {{-- ── Main ─────────────────────────────────────────────────────── --}}
+        {{-- Main --}}
         <div id="mainContent" class="flex-1 flex flex-col min-w-0 ml-0 md:ml-64 transition-all duration-300">
 
             {{-- Top Bar --}}
@@ -43,17 +43,15 @@
         </div>
     </div>
 
-    {{-- ── Edit Profile Modal ────────────────────────────────────────────── --}}
+    {{-- Edit Profile Modal --}}
     <x-profile-modal-admin />
 
-    {{-- ── FOOTER ─────────────────────────────────────────────────────── --}}
+    {{-- FOOTER --}}
 
-    {{-- ── GLOBAL JS ─────────────────────────────────────────────────────── --}}
+    {{-- GLOBAL JS  --}}
+
     <script>
-        // ═══════════════════════════════════════════════════════════════════
         // GLOBAL HELPERS
-        // ═══════════════════════════════════════════════════════════════════
-
         window.CSRF = function() {
             return document.querySelector('meta[name="csrf-token"]')?.content || '';
         };
@@ -114,9 +112,7 @@
             if (el) el.style.display = 'none';
         };
 
-        // ═══════════════════════════════════════════════════════════════════
-        // SIDEBAR COLLAPSE (icon-only ↔ expanded)
-        // ═══════════════════════════════════════════════════════════════════
+        // SIDEBAR COLLAPSE (icon-only expanded)
         (function() {
             const STORAGE_KEY = 'sb_admin_collapsed';
 
@@ -137,12 +133,12 @@
                     sidebar.style.width = '4rem';
                     main.classList.remove('md:ml-64');
                     main.classList.add('md:ml-16');
-                    if (footer) footer.style.display = 'none'; // ← sembunyikan
+                    if (footer) footer.style.display = 'none'; //  sembunyikan
                 } else {
                     sidebar.style.width = '16rem';
                     main.classList.remove('md:ml-16');
                     main.classList.add('md:ml-64');
-                    if (footer) footer.style.display = ''; // ← tampilkan
+                    if (footer) footer.style.display = ''; //  tampilkan
                 }
             }
 
@@ -157,7 +153,7 @@
                 sidebar.classList.add('-translate-x-full');
                 if (overlay) overlay.classList.add('hidden');
                 main.classList.remove('md:ml-64', 'md:ml-16');
-                if (footer) footer.style.display = 'none'; // ← sembunyikan di mobile
+                if (footer) footer.style.display = 'none'; // sembunyikan di mobile
             }
 
             // Reset semua inline style dan class saat di-mobile
@@ -231,7 +227,7 @@
             });
         })();
 
-        // ── Dark Mode ─────────────────────────────────────────────────────
+        // Dark Mode 
         document.addEventListener('DOMContentLoaded', function() {
             const btn = document.getElementById('darkToggle');
             const moon = document.getElementById('iconMoon');
@@ -252,7 +248,7 @@
             });
         });
 
-        // ── Active Nav Link ───────────────────────────────────────────────
+        // Active Nav Link 
         document.addEventListener('DOMContentLoaded', function() {
             const path = window.location.pathname;
             const links = document.querySelectorAll('.nav-link');
@@ -270,7 +266,7 @@
             });
         });
 
-        // ── User Dropdown + load user info ────────────────────────────────
+        // User Dropdown + load user info 
         document.addEventListener('DOMContentLoaded', function() {
             const btn = document.getElementById('userMenuBtn');
             const dropdown = document.getElementById('userDropdown');
@@ -312,7 +308,7 @@
                 .catch(() => {});
         });
 
-        // ── Logout ────────────────────────────────────────────────────────
+        // Logout 
         window.doLogout = async function() {
             try {
                 await fetch('/api/logout', {
@@ -326,7 +322,7 @@
             window.location.href = '/login';
         };
 
-        // ── Edit Profile Modal ────────────────────────────────────────────
+        // Edit Profile Modal 
         window.openProfileModal = function() {
             document.getElementById('userDropdown').style.display = 'none';
 

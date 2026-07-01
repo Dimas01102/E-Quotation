@@ -82,8 +82,8 @@ class SupplierRfqController extends Controller
                 'invited_at'          => $inv->invited_at,
                 'can_submit'          => $canSubmit,
                 'has_submitted'       => $hasActivePendingQuotation,
-                'is_winner'           => $isWinner,        // baru: flag pemenang untuk frontend
-                'deadline_passed'     => !$deadlineIsFuture, // baru: flag deadline untuk frontend
+                'is_winner'           => $isWinner,        // flag pemenang untuk frontend
+                'deadline_passed'     => !$deadlineIsFuture, // flag deadline untuk frontend
                 'batch' => [
                     'id_batch'     => $batch?->id_batch,
                     'batch_number' => $batch?->batch_number,
@@ -105,10 +105,10 @@ class SupplierRfqController extends Controller
                 ]),
                 /*
                  * Untuk quotation yang ditampilkan di card:
-                 * - Jika winner (is_winner=true) dan can_submit=true → tampilkan null
+                 * - Jika winner (is_winner=true) dan can_submit=true -> tampilkan null
                  *   supaya frontend tahu bahwa winner perlu submit ulang (ada approved sebelumnya
                  *   tapi sekarang batch di-reopen)
-                 * - Selain itu → tampilkan quotation terakhir seperti biasa
+                 * - Selain itu -> tampilkan quotation terakhir seperti biasa
                  */
                 'quotation' => ($isWinner && $canSubmit) ? null : ($latestQuotation ? [
                     'id_quotation' => $latestQuotation->id_quotation,

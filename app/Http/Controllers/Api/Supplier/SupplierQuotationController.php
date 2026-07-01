@@ -94,7 +94,7 @@ class SupplierQuotationController extends Controller
             ], 422);
         }
 
-        // ─── cek duplikat dengan mempertimbangkan re-open ─────────
+        // Check duplicate quotation with re-open
         $existingQuotation = Quotation::where('id_invited_supplier', $invitation->id_invited_supplier)
             ->latest('submitted_at')
             ->first();
@@ -180,7 +180,7 @@ class SupplierQuotationController extends Controller
 
             $headerMap = null;
 
-            // ── Mapping kolom Excel → field DB (sesuai tabel quotation_items) ──
+            // Mapping column Excel -> field DB (using table quotation_items)
             $colMap = [
                 'coll_no'         => ['Coll No.', 'Coll No', 'COLL NO', 'COLL NO.', 'COLL_NO'],
                 'rfq_no'          => ['RFQ No.', 'RFQ No', 'RFQ NO', 'RFQ NO.', 'RFQ_NO'],

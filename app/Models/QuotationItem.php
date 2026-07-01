@@ -38,7 +38,7 @@ class QuotationItem extends Model
 
     /**
      * Relasi ke Quotation
-     * quotation_items.id_quotation → quotations.id_quotation
+     * quotation_items.id_quotation -> quotations.id_quotation
      */
     public function quotation()
     {

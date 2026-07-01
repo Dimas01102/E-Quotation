@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('page-title', 'Supplier') — E-Quotation</title>
+    <title>@yield('page-title', 'Supplier') - E-Quotation</title>
     <link rel="icon" type="image/png" href="/assets/images/logo.jpg">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -18,40 +18,32 @@
 
     <div class="flex min-h-screen">
 
-        {{-- ── Overlay (sama persis seperti admin) ─────────────────────── --}}
+        {{-- Overlay (mobile) --}}
         <div id="sidebarOverlay"
              class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
 
-        {{-- ══════════════════════════════════════════════════════════════
-            SIDEBAR
-        ══════════════════════════════════════════════════════════════ --}}
+        {{-- SIDEBAR --}}
         <x-sidebar type="supplier" />
 
-        {{-- ══════════════════════════════════════════════════════════════
-             PAGE AREA
-        ══════════════════════════════════════════════════════════════ --}}
+        {{-- PAGE AREA --}}
         <div id="mainContent"
              class="flex-1 flex flex-col min-w-0 ml-0 md:ml-64 transition-all duration-300">
 
-            {{-- ── TOPBAR ──────────────────────────────────────────────── --}}
+            {{-- TOPBAR --}}
             <x-top-header-suplier />
 
             {{-- Overlay untuk mobile --}}
 
-            {{-- ── CONTENT ─────────────────────────────────────────────── --}}
+            {{-- CONTENT --}}
             <main class="flex-1 overflow-y-auto">
                 @yield('content')
             </main>
         </div>
     </div>
 
-    {{-- ════════════════════════════════════════════════════════════════
-         GLOBAL SCRIPTS
-    ════════════════════════════════════════════════════════════════ --}}
+    {{-- GLOBAL SCRIPTS --}}
     <script>
-        // ═══════════════════════════════════════════════════════════════
         // GLOBAL HELPERS
-        // ═══════════════════════════════════════════════════════════════
         const CSRF = () => document.querySelector('meta[name="csrf-token"]')?.content || '';
 
         window.fmtRp = function (n) {
@@ -98,9 +90,7 @@
             if (el) el.style.display = 'none';
         };
 
-        // ═══════════════════════════════════════════════════════════════
         // SIDEBAR COLLAPSE
-        // ═══════════════════════════════════════════════════════════════
         (function () {
             const STORAGE_KEY = 'sb_supplier_collapsed';
 
@@ -248,7 +238,7 @@
             });
         })();
 
-        // ── Dark Mode ─────────────────────────────────────────────────
+        // Dark Mode
         document.addEventListener('DOMContentLoaded', function () {
             const btn  = document.getElementById('darkToggle');
             const moon = document.getElementById('iconMoon');
@@ -271,7 +261,7 @@
             }
         });
 
-        // ── Load User ─────────────────────────────────────────────────
+        // Load User
         async function loadUser() {
             try {
                 const res = await fetch('/api/auth/me', {
@@ -287,7 +277,7 @@
             } catch (e) {}
         }
 
-        // ── Logout ────────────────────────────────────────────────────
+        // Logout
         async function doLogout() {
             try {
                 await fetch('/api/logout', {

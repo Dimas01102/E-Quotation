@@ -29,7 +29,7 @@ return new class extends Migration
                   ->onDelete('cascade');
         });
 
-        // 9️⃣ QUOTATIONS
+        // 9️ QUOTATIONS
         Schema::create('quotations', function (Blueprint $table) {
             $table->increments('id_quotation');                     // id_quotation INT AUTO_INCREMENT PRIMARY KEY
             $table->unsignedInteger('id_invited_supplier')->nullable();

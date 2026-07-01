@@ -25,7 +25,7 @@ return new class extends Migration
                   ->onDelete('cascade');
         });
 
-        // 7️⃣ ITEMS BATCH CATEGORIES
+        // 7️ ITEMS BATCH CATEGORIES
         Schema::create('items_batch_categories', function (Blueprint $table) {
             $table->increments('id_item_batch_category');           // id_item_batch_category INT AUTO_INCREMENT PRIMARY KEY
             $table->unsignedInteger('id_item')->nullable();

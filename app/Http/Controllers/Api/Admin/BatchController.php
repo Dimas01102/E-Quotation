@@ -104,7 +104,7 @@ class BatchController extends Controller
 
         if ($reopened) {
             $this->reopenForWinnersOnly($batch->fresh());
-            // Tidak ada notifyWinnersOnReopen di sini
+            // Tidak ada notifyWinnersOnReopen 
             // Email hanya terkirim kalau admin klik tombol "Kirim Reminder"
         }
 
@@ -121,7 +121,7 @@ class BatchController extends Controller
         return response()->json(['success' => true, 'message' => 'Batch dihapus.']);
     }
 
-    // ── Kategori ──────────────────────────────────────────────────────
+    // Kategori 
     public function addCategory(Request $request, $id)
     {
         Batch::findOrFail($id);
@@ -142,7 +142,7 @@ class BatchController extends Controller
         return response()->json(['success' => true, 'message' => 'Kategori dihapus.']);
     }
 
-    // ── Item ──────────────────────────────────────────────────────────
+    // Item 
     public function addItem(Request $request, $batchId, $catId)
     {
         BatchCategory::where('id_batch', $batchId)->where('id_batch_category', $catId)->firstOrFail();
@@ -174,7 +174,7 @@ class BatchController extends Controller
         return response()->json(['success' => true, 'message' => 'Item dihapus.']);
     }
 
-    // ── Invite Supplier ───────────────────────────────────────────────
+    // Invite Supplier 
     public function inviteSupplier(Request $request, $batchId)
     {
         $batch = Batch::findOrFail($batchId);
@@ -220,7 +220,7 @@ class BatchController extends Controller
         return response()->json(['success' => true, 'message' => 'Supplier diundang & email terkirim.', 'invitation' => $invitation->load('supplier.user')], 201);
     }
 
-    // ── Compare ───────────────────────────────────────────────────────
+    // Compare 
     public function compare($id)
     {
         $batch = Batch::findOrFail($id);
@@ -243,7 +243,7 @@ class BatchController extends Controller
     // ── Send Winner Reminder ──────────────────────────────────────────
     /**
      * Kirim reminder ke supplier pemenang (approved).
-     * Supplier yang rejected TIDAK mendapat reminder sudah closed.
+     * Supplier yang rejected tidak mendapat reminder sudah closed.
      */
     public function sendWinnerReminder(Request $request, $id)
     {
@@ -270,7 +270,7 @@ class BatchController extends Controller
         return response()->json(['success' => true, 'message' => 'Reminder terkirim ke supplier pemenang.']);
     }
 
-    // ─── Private ──────────────────────────────────────────────────────
+    // Private Methods
 
     /**
      * Saat batch di-reopen:

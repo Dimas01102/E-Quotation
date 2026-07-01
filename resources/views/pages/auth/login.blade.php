@@ -316,10 +316,10 @@
     </aside>
 
     <main class="form-panel">
-        <a href="/" class="back-link">
+        {{-- <a href="/" class="back-link">
             <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             Kembali ke Beranda
-        </a>
+        </a> --}}
 
         <h2 class="form-title">Masuk ke Akun</h2>
         <p class="form-subtitle">Masukkan email dan password untuk login ke sistem.</p>
