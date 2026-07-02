@@ -4,7 +4,7 @@
         class="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md mx-4 shadow-2xl
                 border border-gray-200 dark:border-gray-700">
 
-        {{--  Header  --}}
+        {{-- Header --}}
         <div
             class="flex items-center justify-between px-6 py-4
                     border-b border-gray-100 dark:border-gray-800">
@@ -35,10 +35,10 @@
                 <label class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
                     Email
                 </label>
-                <input id="profileEmail" type="email" disabled
-                    class="w-full px-4 py-2.5 text-sm bg-gray-100 dark:bg-gray-700
-                           border border-gray-200 dark:border-gray-600 rounded-xl
-                           text-gray-500 dark:text-gray-400 cursor-not-allowed">
+                <input id="profileEmail" type="email" readonly
+                    class="w-full px-4 py-2.5 text-sm bg-gray-100 dark:bg-gray-800
+                           border border-gray-200 dark:border-gray-700 rounded-xl
+                           text-gray-800 dark:text-white cursor-not-allowed">
             </div>
 
             <div class="pt-2 border-t border-gray-100 dark:border-gray-800">
@@ -63,7 +63,7 @@
             </div>
         </div>
 
-        {{-- Footer  --}}
+        {{-- Footer --}}
         <div class="px-6 pb-6 flex gap-3">
             <button onclick="saveProfile()"
                 class="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white

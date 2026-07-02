@@ -19,7 +19,7 @@
 
     <div class="flex min-h-screen">
 
-        {{-- Sidebar --}}
+        {{--  Sidebar --}}
         <x-sidebar type="admin" />
 
         {{-- Overlay untuk mobile --}}
@@ -27,7 +27,7 @@
         <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
 
 
-        {{-- Main --}}
+        {{--  Main Content --}}
         <div id="mainContent" class="flex-1 flex flex-col min-w-0 ml-0 md:ml-64 transition-all duration-300">
 
             {{-- Top Bar --}}
@@ -43,15 +43,15 @@
         </div>
     </div>
 
-    {{-- Edit Profile Modal --}}
+    {{--  Edit Profile Modal --}}
     <x-profile-modal-admin />
 
-    {{-- FOOTER --}}
+    {{--  Footer --}}
 
-    {{-- GLOBAL JS  --}}
-
+    {{--  GLOBAL JS --}}
     <script>
         // GLOBAL HELPERS
+
         window.CSRF = function() {
             return document.querySelector('meta[name="csrf-token"]')?.content || '';
         };
@@ -133,12 +133,12 @@
                     sidebar.style.width = '4rem';
                     main.classList.remove('md:ml-64');
                     main.classList.add('md:ml-16');
-                    if (footer) footer.style.display = 'none'; //  sembunyikan
+                    if (footer) footer.style.display = 'none'; // sembunyikan
                 } else {
                     sidebar.style.width = '16rem';
                     main.classList.remove('md:ml-16');
                     main.classList.add('md:ml-64');
-                    if (footer) footer.style.display = ''; //  tampilkan
+                    if (footer) footer.style.display = ''; // tampilkan
                 }
             }
 
@@ -185,7 +185,7 @@
                     const isHidden = sidebar.classList.contains('-translate-x-full');
                     sidebar.classList.toggle('-translate-x-full', !isHidden);
                     if (overlay) overlay.classList.toggle('hidden', !isHidden);
-                    if (footer) footer.style.display = isHidden ? '' : 'none'; // ← toggle footer
+                    if (footer) footer.style.display = isHidden ? '' : 'none'; // toggle footer
                     return;
                 }
 
@@ -222,12 +222,12 @@
                     applyDesktopState();
                 }
 
-                // Pantau perubahan ukuran window
+                // perubahan ukuran window
                 window.addEventListener('resize', handleResize);
             });
         })();
 
-        // Dark Mode 
+        // Dark Mode
         document.addEventListener('DOMContentLoaded', function() {
             const btn = document.getElementById('darkToggle');
             const moon = document.getElementById('iconMoon');
@@ -248,7 +248,7 @@
             });
         });
 
-        // Active Nav Link 
+        // Active Nav Link
         document.addEventListener('DOMContentLoaded', function() {
             const path = window.location.pathname;
             const links = document.querySelectorAll('.nav-link');
@@ -266,7 +266,7 @@
             });
         });
 
-        // User Dropdown + load user info 
+        // User Dropdown + load user info
         document.addEventListener('DOMContentLoaded', function() {
             const btn = document.getElementById('userMenuBtn');
             const dropdown = document.getElementById('userDropdown');
@@ -291,8 +291,9 @@
                     }
                 })
                 .then(r => r.ok ? r.json() : null)
-                .then(data => {
-                    if (!data) return;
+                .then(res => {
+                    if (!res) return;
+                    const data = res.data || res;
                     const name = data.name || 'Admin';
                     const email = data.email || '';
                     const avatar = name.charAt(0).toUpperCase();
@@ -333,7 +334,8 @@
                     }
                 })
                 .then(r => r.ok ? r.json() : {})
-                .then(data => {
+                .then(res => {
+                    const data = res.data || res;
                     document.getElementById('profileName').value = data.name || '';
                     document.getElementById('profileEmail').value = data.email || '';
                     document.getElementById('profilePassword').value = '';
@@ -396,6 +398,13 @@
                 const json = await res.json();
 
                 if (res.ok && json.success) {
+                    // Jika password ikut diubah, otomatis logout 
+                    if (pw) {
+                        showAlert('Password berhasil diubah. Anda akan logout...', true);
+                        setTimeout(doLogout, 1500);
+                        return;
+                    }
+
                     showAlert('Profil berhasil diperbarui!', true);
                     const set = (id, val) => {
                         const el = document.getElementById(id);
